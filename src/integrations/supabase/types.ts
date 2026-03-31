@@ -14,7 +14,426 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      clubs: {
+        Row: {
+          abbreviation: string
+          balance: number
+          created_at: string
+          division: number
+          fans: number
+          founded_at: string
+          id: string
+          league: string
+          members: number
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          abbreviation: string
+          balance?: number
+          created_at?: string
+          division?: number
+          fans?: number
+          founded_at?: string
+          id?: string
+          league?: string
+          members?: number
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          abbreviation?: string
+          balance?: number
+          created_at?: string
+          division?: number
+          fans?: number
+          founded_at?: string
+          id?: string
+          league?: string
+          members?: number
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      financial_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          club_id: string
+          created_at: string
+          description: string
+          id: string
+          type: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          club_id: string
+          created_at?: string
+          description: string
+          id?: string
+          type: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          club_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_transactions_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      juniors: {
+        Row: {
+          age: number
+          club_id: string
+          created_at: string
+          id: string
+          name: string
+          position: Database["public"]["Enums"]["player_position"]
+          quality: number
+          revealed: boolean
+          talento: number
+          updated_at: string
+          weeks_to_reveal: number
+        }
+        Insert: {
+          age?: number
+          club_id: string
+          created_at?: string
+          id?: string
+          name: string
+          position: Database["public"]["Enums"]["player_position"]
+          quality?: number
+          revealed?: boolean
+          talento?: number
+          updated_at?: string
+          weeks_to_reveal?: number
+        }
+        Update: {
+          age?: number
+          club_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          position?: Database["public"]["Enums"]["player_position"]
+          quality?: number
+          revealed?: boolean
+          talento?: number
+          updated_at?: string
+          weeks_to_reveal?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "juniors_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patrimony: {
+        Row: {
+          club_id: string
+          construction_weeks_remaining: number
+          created_at: string
+          id: string
+          level: number
+          maintenance_cost: number
+          max_level: number
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          construction_weeks_remaining?: number
+          created_at?: string
+          id?: string
+          level?: number
+          maintenance_cost?: number
+          max_level?: number
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          construction_weeks_remaining?: number
+          created_at?: string
+          id?: string
+          level?: number
+          maintenance_cost?: number
+          max_level?: number
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patrimony_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      players: {
+        Row: {
+          age: number
+          agressividade: number
+          armacao: number
+          chute: number
+          club_id: string
+          created_at: string
+          desarme: number
+          entrosamento: number
+          experiencia: number
+          forca: number
+          forma: number
+          honestidade: number
+          id: string
+          injury_weeks: number
+          inteligencia: number
+          is_captain: boolean
+          is_for_sale: boolean
+          is_injured: boolean
+          jogo_aereo: number
+          lideranca: number
+          market_value: number
+          moral: number
+          name: string
+          passe: number
+          posicionamento: number
+          position: Database["public"]["Enums"]["player_position"]
+          potencial_forca: number
+          potencial_forma: number
+          potencial_resistencia: number
+          potencial_velocidade: number
+          reflexos: number
+          resistencia: number
+          salary: number
+          talento: number
+          tecnica: number
+          updated_at: string
+          velocidade: number
+        }
+        Insert: {
+          age: number
+          agressividade?: number
+          armacao?: number
+          chute?: number
+          club_id: string
+          created_at?: string
+          desarme?: number
+          entrosamento?: number
+          experiencia?: number
+          forca?: number
+          forma?: number
+          honestidade?: number
+          id?: string
+          injury_weeks?: number
+          inteligencia?: number
+          is_captain?: boolean
+          is_for_sale?: boolean
+          is_injured?: boolean
+          jogo_aereo?: number
+          lideranca?: number
+          market_value?: number
+          moral?: number
+          name: string
+          passe?: number
+          posicionamento?: number
+          position: Database["public"]["Enums"]["player_position"]
+          potencial_forca?: number
+          potencial_forma?: number
+          potencial_resistencia?: number
+          potencial_velocidade?: number
+          reflexos?: number
+          resistencia?: number
+          salary?: number
+          talento?: number
+          tecnica?: number
+          updated_at?: string
+          velocidade?: number
+        }
+        Update: {
+          age?: number
+          agressividade?: number
+          armacao?: number
+          chute?: number
+          club_id?: string
+          created_at?: string
+          desarme?: number
+          entrosamento?: number
+          experiencia?: number
+          forca?: number
+          forma?: number
+          honestidade?: number
+          id?: string
+          injury_weeks?: number
+          inteligencia?: number
+          is_captain?: boolean
+          is_for_sale?: boolean
+          is_injured?: boolean
+          jogo_aereo?: number
+          lideranca?: number
+          market_value?: number
+          moral?: number
+          name?: string
+          passe?: number
+          posicionamento?: number
+          position?: Database["public"]["Enums"]["player_position"]
+          potencial_forca?: number
+          potencial_forma?: number
+          potencial_resistencia?: number
+          potencial_velocidade?: number
+          reflexos?: number
+          resistencia?: number
+          salary?: number
+          talento?: number
+          tecnica?: number
+          updated_at?: string
+          velocidade?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "players_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      stadium_sectors: {
+        Row: {
+          capacity: number
+          club_id: string
+          created_at: string
+          id: string
+          ring: number
+          seat_type: string
+          sector_name: string
+          structure: string
+          updated_at: string
+        }
+        Insert: {
+          capacity?: number
+          club_id: string
+          created_at?: string
+          id?: string
+          ring?: number
+          seat_type?: string
+          sector_name: string
+          structure?: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number
+          club_id?: string
+          created_at?: string
+          id?: string
+          ring?: number
+          seat_type?: string
+          sector_name?: string
+          structure?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stadium_sectors_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_config: {
+        Row: {
+          club_id: string
+          coach_level: number
+          created_at: string
+          fitness_coach_level: number
+          id: string
+          physical_intensity: number
+          physical_type: string
+          technical_type: string
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          coach_level?: number
+          created_at?: string
+          fitness_coach_level?: number
+          id?: string
+          physical_intensity?: number
+          physical_type?: string
+          technical_type?: string
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          coach_level?: number
+          created_at?: string
+          fitness_coach_level?: number
+          id?: string
+          physical_intensity?: number
+          physical_type?: string
+          technical_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_config_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: true
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +442,17 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      player_position:
+        | "goleiro"
+        | "libero"
+        | "zagueiro"
+        | "lateral"
+        | "volante"
+        | "meia"
+        | "ala"
+        | "meia_atacante"
+        | "ponteiro"
+        | "atacante"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +579,19 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      player_position: [
+        "goleiro",
+        "libero",
+        "zagueiro",
+        "lateral",
+        "volante",
+        "meia",
+        "ala",
+        "meia_atacante",
+        "ponteiro",
+        "atacante",
+      ],
+    },
   },
 } as const
