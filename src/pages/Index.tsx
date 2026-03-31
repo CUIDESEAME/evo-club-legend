@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import heroImg from "@/assets/hero-stadium.jpg";
 import { Trophy, Users, Dumbbell, Building2, Coins, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
