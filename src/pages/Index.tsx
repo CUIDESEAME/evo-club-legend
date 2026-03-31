@@ -99,7 +99,7 @@ const Index = () => {
             transition={{ delay: 0.7, duration: 0.8 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Button size="lg" className="bg-primary text-primary-foreground font-heading text-lg tracking-wide px-10 py-6 glow-green hover:brightness-110 transition-all">
+            <Button size="lg" onClick={() => navigate("/auth")} className="bg-primary text-primary-foreground font-heading text-lg tracking-wide px-10 py-6 glow-green hover:brightness-110 transition-all">
               COMECE AGORA
             </Button>
             <Button size="lg" variant="outline" className="border-border text-foreground font-heading text-lg tracking-wide px-10 py-6 hover:bg-secondary transition-all">
