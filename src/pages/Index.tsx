@@ -293,6 +293,7 @@ const Index = () => {
           </p>
           <Button
             size="lg"
+            onClick={() => navigate("/auth")}
             className="bg-accent text-accent-foreground font-heading text-xl tracking-wide px-14 py-7 glow-gold hover:brightness-110 transition-all"
           >
             CRIAR MEU CLUBE
