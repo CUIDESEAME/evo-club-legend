@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import heroImg from "@/assets/hero-stadium.jpg";
 import { Trophy, Users, Dumbbell, Building2, Coins, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -55,6 +56,7 @@ const positions = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Hero */}
@@ -98,7 +100,7 @@ const Index = () => {
             transition={{ delay: 0.7, duration: 0.8 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Button size="lg" className="bg-primary text-primary-foreground font-heading text-lg tracking-wide px-10 py-6 glow-green hover:brightness-110 transition-all">
+            <Button size="lg" onClick={() => navigate("/auth")} className="bg-primary text-primary-foreground font-heading text-lg tracking-wide px-10 py-6 glow-green hover:brightness-110 transition-all">
               COMECE AGORA
             </Button>
             <Button size="lg" variant="outline" className="border-border text-foreground font-heading text-lg tracking-wide px-10 py-6 hover:bg-secondary transition-all">
@@ -291,6 +293,7 @@ const Index = () => {
           </p>
           <Button
             size="lg"
+            onClick={() => navigate("/auth")}
             className="bg-accent text-accent-foreground font-heading text-xl tracking-wide px-14 py-7 glow-gold hover:brightness-110 transition-all"
           >
             CRIAR MEU CLUBE
