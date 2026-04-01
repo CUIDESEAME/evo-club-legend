@@ -4,15 +4,23 @@ import { useClub, usePlayers } from "@/hooks/useClub";
 import GameLayout from "@/components/GameLayout";
 import { POSITION_LABELS, POSITION_ABBREVIATIONS, ATTRIBUTE_LEVELS, formatMoney, getOverallRating, getAttributeColor } from "@/lib/gameUtils";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Star, DollarSign, UserX, Shield } from "lucide-react";
 
 const TECH_ATTRS = ["reflexos", "posicionamento", "jogo_aereo", "desarme", "armacao", "passe", "tecnica", "chute"] as const;
 const PHYS_ATTRS = ["velocidade", "forca", "resistencia", "forma"] as const;
+const MENTAL_ATTRS = ["experiencia", "lideranca", "inteligencia", "agressividade", "honestidade"] as const;
 
 const ATTR_LABELS: Record<string, string> = {
   reflexos: "Reflexos", posicionamento: "Posic.", jogo_aereo: "J.Aéreo",
   desarme: "Desarme", armacao: "Armação", passe: "Passe",
   tecnica: "Técnica", chute: "Chute",
   velocidade: "Veloc.", forca: "Força", resistencia: "Resist.", forma: "Forma",
+  experiencia: "Experiência", lideranca: "Liderança", inteligencia: "Inteligência",
+  agressividade: "Agressividade", honestidade: "Honestidade",
 };
 
 const Elenco = () => {
@@ -20,6 +28,9 @@ const Elenco = () => {
   const { data: club, isLoading } = useClub();
   const { data: players } = usePlayers(club?.id);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [acting, setActing] = useState(false);
 
   if (authLoading || isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
   if (!user) return <Navigate to="/auth" replace />;
@@ -27,11 +38,42 @@ const Elenco = () => {
 
   const selected = players?.find(p => p.id === selectedId);
 
+  const setCaptain = async (playerId: string) => {
+    setActing(true);
+    // Remove current captain
+    const currentCaptain = players?.find(p => p.is_captain);
+    if (currentCaptain) {
+      await supabase.from("players").update({ is_captain: false }).eq("id", currentCaptain.id);
+    }
+    await supabase.from("players").update({ is_captain: true }).eq("id", playerId);
+    toast({ title: "Capitão definido!" });
+    queryClient.invalidateQueries({ queryKey: ["players"] });
+    setActing(false);
+  };
+
+  const toggleForSale = async (player: any) => {
+    setActing(true);
+    await supabase.from("players").update({ is_for_sale: !player.is_for_sale }).eq("id", player.id);
+    toast({ title: player.is_for_sale ? "Removido do mercado" : "Colocado à venda!" });
+    queryClient.invalidateQueries({ queryKey: ["players"] });
+    setActing(false);
+  };
+
+  const releasePlayer = async (player: any) => {
+    if (!confirm(`Dispensar ${player.name}? Esta ação não pode ser desfeita.`)) return;
+    setActing(true);
+    await supabase.from("players").delete().eq("id", player.id);
+    toast({ title: `${player.name} dispensado`, variant: "destructive" });
+    setSelectedId(null);
+    queryClient.invalidateQueries({ queryKey: ["players"] });
+    setActing(false);
+  };
+
   return (
     <GameLayout>
       <div className="space-y-6">
         <h1 className="font-heading text-3xl font-bold text-foreground">Elenco</h1>
-        <p className="text-muted-foreground">{players?.length ?? 0}/50 jogadores</p>
+        <p className="text-muted-foreground">{players?.length ?? 0}/50 jogadores • Salários: {formatMoney(players?.reduce((s, p) => s + p.salary, 0) ?? 0)}/sem</p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Player list */}
@@ -59,6 +101,7 @@ const Elenco = () => {
                   >
                     <td className="py-2 text-foreground font-medium">
                       {p.is_captain && <span className="text-accent mr-1">©</span>}
+                      {p.is_for_sale && <span className="text-primary mr-1">💰</span>}
                       {p.name}
                       {p.is_injured && <span className="text-destructive ml-1">🤕</span>}
                     </td>
@@ -98,6 +141,21 @@ const Elenco = () => {
                   </p>
                 </div>
 
+                {/* Actions */}
+                <div className="flex flex-wrap gap-2">
+                  {!selected.is_captain && (
+                    <Button size="sm" variant="outline" onClick={() => setCaptain(selected.id)} disabled={acting}>
+                      <Shield size={14} /> Capitão
+                    </Button>
+                  )}
+                  <Button size="sm" variant="outline" onClick={() => toggleForSale(selected)} disabled={acting}>
+                    <DollarSign size={14} /> {selected.is_for_sale ? "Tirar da venda" : "Colocar à venda"}
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={() => releasePlayer(selected)} disabled={acting}>
+                    <UserX size={14} /> Dispensar
+                  </Button>
+                </div>
+
                 <div>
                   <h4 className="text-xs text-muted-foreground mb-2 font-heading">TÉCNICOS</h4>
                   <div className="space-y-1">
@@ -106,14 +164,9 @@ const Elenco = () => {
                         <span className="text-xs text-muted-foreground">{ATTR_LABELS[a]}</span>
                         <div className="flex items-center gap-2">
                           <div className="w-20 h-1.5 bg-secondary rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-primary rounded-full"
-                              style={{ width: `${(selected[a] / 16) * 100}%` }}
-                            />
+                            <div className="h-full bg-primary rounded-full" style={{ width: `${(selected[a] / 16) * 100}%` }} />
                           </div>
-                          <span className={`text-xs font-mono w-4 ${getAttributeColor(selected[a])}`}>
-                            {selected[a]}
-                          </span>
+                          <span className={`text-xs font-mono w-4 ${getAttributeColor(selected[a])}`}>{selected[a]}</span>
                         </div>
                       </div>
                     ))}
@@ -128,26 +181,36 @@ const Elenco = () => {
                         <span className="text-xs text-muted-foreground">{ATTR_LABELS[a]}</span>
                         <div className="flex items-center gap-2">
                           <div className="w-20 h-1.5 bg-secondary rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-accent rounded-full"
-                              style={{ width: `${(selected[a] / 9) * 100}%` }}
-                            />
+                            <div className="h-full bg-accent rounded-full" style={{ width: `${(selected[a] / 16) * 100}%` }} />
                           </div>
-                          <span className={`text-xs font-mono w-4 ${getAttributeColor(selected[a])}`}>
-                            {selected[a]}
-                          </span>
+                          <span className={`text-xs font-mono w-4 ${getAttributeColor(selected[a])}`}>{selected[a]}</span>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
+                <div>
+                  <h4 className="text-xs text-muted-foreground mb-2 font-heading">MENTAIS</h4>
+                  <div className="space-y-1">
+                    {MENTAL_ATTRS.map(a => (
+                      <div key={a} className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">{ATTR_LABELS[a]}</span>
+                        <span className={`text-xs font-mono ${getAttributeColor(selected[a])}`}>
+                          {ATTRIBUTE_LEVELS[selected[a]] ?? selected[a]}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="pt-2 border-t border-border text-xs text-muted-foreground space-y-1">
+                  <p>Talento: <span className="text-foreground font-heading">{ATTRIBUTE_LEVELS[selected.talento]}</span></p>
                   <p>Entrosamento: {selected.entrosamento}%</p>
                   <p>Moral: {selected.moral}%</p>
-                  <p>Experiência: {ATTRIBUTE_LEVELS[selected.experiencia]}</p>
                   <p>Salário: {formatMoney(selected.salary)}/sem</p>
                   <p>Valor de mercado: {formatMoney(selected.market_value)}</p>
+                  {selected.is_injured && <p className="text-destructive">🤕 Lesionado: {selected.injury_weeks} semanas</p>}
                 </div>
               </div>
             ) : (
