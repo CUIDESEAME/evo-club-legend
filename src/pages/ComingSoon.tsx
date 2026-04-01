@@ -24,7 +24,6 @@ function ComingSoon({ title, description }: { title: string; description: string
   );
 }
 
-export const Juniores = () => <ComingSoon title="Juniores" description="Sistema de categoria de base com revelação de talentos." />;
 export const Mercado = () => <ComingSoon title="Mercado" description="Compra, venda e leilões de jogadores." />;
 export const Liga = () => <ComingSoon title="Liga" description="Campeonatos, tabela e classificação." />;
 export const Partidas = () => <ComingSoon title="Partidas" description="Acompanhe jogos ao vivo minuto a minuto." />;
