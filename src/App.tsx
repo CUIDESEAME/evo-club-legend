@@ -13,7 +13,9 @@ import Treino from "./pages/Treino";
 import Patrimonio from "./pages/Patrimonio";
 import Financas from "./pages/Financas";
 import Juniores from "./pages/Juniores";
-import { Mercado, Liga, Partidas, VIP } from "./pages/ComingSoon";
+import Liga from "./pages/Liga";
+import Partidas from "./pages/Partidas";
+import { Mercado, VIP } from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

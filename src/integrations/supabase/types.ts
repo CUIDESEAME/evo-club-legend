@@ -147,6 +147,201 @@ export type Database = {
           },
         ]
       }
+      league_standings: {
+        Row: {
+          club_id: string | null
+          created_at: string
+          draws: number
+          goals_against: number
+          goals_for: number
+          id: string
+          losses: number
+          npc_club_id: string | null
+          played: number
+          points: number
+          season_id: string
+          wins: number
+        }
+        Insert: {
+          club_id?: string | null
+          created_at?: string
+          draws?: number
+          goals_against?: number
+          goals_for?: number
+          id?: string
+          losses?: number
+          npc_club_id?: string | null
+          played?: number
+          points?: number
+          season_id: string
+          wins?: number
+        }
+        Update: {
+          club_id?: string | null
+          created_at?: string
+          draws?: number
+          goals_against?: number
+          goals_for?: number
+          id?: string
+          losses?: number
+          npc_club_id?: string | null
+          played?: number
+          points?: number
+          season_id?: string
+          wins?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "league_standings_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "league_standings_npc_club_id_fkey"
+            columns: ["npc_club_id"]
+            isOneToOne: false
+            referencedRelation: "npc_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "league_standings_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          away_club_id: string | null
+          away_npc_id: string | null
+          away_score: number | null
+          created_at: string
+          home_club_id: string | null
+          home_npc_id: string | null
+          home_score: number | null
+          id: string
+          played_at: string | null
+          revenue: number
+          round: number
+          season_id: string
+          status: string
+        }
+        Insert: {
+          away_club_id?: string | null
+          away_npc_id?: string | null
+          away_score?: number | null
+          created_at?: string
+          home_club_id?: string | null
+          home_npc_id?: string | null
+          home_score?: number | null
+          id?: string
+          played_at?: string | null
+          revenue?: number
+          round?: number
+          season_id: string
+          status?: string
+        }
+        Update: {
+          away_club_id?: string | null
+          away_npc_id?: string | null
+          away_score?: number | null
+          created_at?: string
+          home_club_id?: string | null
+          home_npc_id?: string | null
+          home_score?: number | null
+          id?: string
+          played_at?: string | null
+          revenue?: number
+          round?: number
+          season_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_away_club_id_fkey"
+            columns: ["away_club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_away_npc_id_fkey"
+            columns: ["away_npc_id"]
+            isOneToOne: false
+            referencedRelation: "npc_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_home_club_id_fkey"
+            columns: ["home_club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_home_npc_id_fkey"
+            columns: ["home_npc_id"]
+            isOneToOne: false
+            referencedRelation: "npc_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      npc_clubs: {
+        Row: {
+          abbreviation: string
+          created_at: string
+          division: number
+          fan_base: number
+          id: string
+          league: string
+          name: string
+          season_id: string
+          strength: number
+        }
+        Insert: {
+          abbreviation: string
+          created_at?: string
+          division?: number
+          fan_base?: number
+          id?: string
+          league?: string
+          name: string
+          season_id: string
+          strength?: number
+        }
+        Update: {
+          abbreviation?: string
+          created_at?: string
+          division?: number
+          fan_base?: number
+          id?: string
+          league?: string
+          name?: string
+          season_id?: string
+          strength?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "npc_clubs_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patrimony: {
         Row: {
           club_id: string
@@ -346,6 +541,39 @@ export type Database = {
         }
         Relationships: []
       }
+      seasons: {
+        Row: {
+          created_at: string
+          current_round: number
+          division: number
+          id: string
+          league: string
+          season_number: number
+          status: string
+          total_rounds: number
+        }
+        Insert: {
+          created_at?: string
+          current_round?: number
+          division?: number
+          id?: string
+          league?: string
+          season_number?: number
+          status?: string
+          total_rounds?: number
+        }
+        Update: {
+          created_at?: string
+          current_round?: number
+          division?: number
+          id?: string
+          league?: string
+          season_number?: number
+          status?: string
+          total_rounds?: number
+        }
+        Relationships: []
+      }
       stadium_sectors: {
         Row: {
           capacity: number
@@ -439,7 +667,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      initialize_season_for_club: {
+        Args: { p_club_id: string }
+        Returns: string
+      }
       process_game_week: { Args: never; Returns: Json }
+      simulate_matches: { Args: never; Returns: Json }
       take_loan: {
         Args: { p_amount: number; p_club_id: string }
         Returns: undefined

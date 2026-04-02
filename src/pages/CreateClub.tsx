@@ -159,6 +159,10 @@ const CreateClub = () => {
       const { error: stadError } = await supabase.from("stadium_sectors").insert(stadiumSectors);
       if (stadError) throw stadError;
 
+      // Initialize first season
+      const { error: seasonError } = await supabase.rpc("initialize_season_for_club", { p_club_id: club.id });
+      if (seasonError) throw seasonError;
+
       toast.success("Clube criado com sucesso!");
       navigate("/dashboard");
     } catch (err: any) {
