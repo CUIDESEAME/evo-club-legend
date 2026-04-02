@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useClub } from "@/hooks/useClub";
-import { usePlayers, usePatrimony } from "@/hooks/useClub";
+import { usePlayers, usePatrimony, useStadiumSectors } from "@/hooks/useClub";
 import GameLayout from "@/components/GameLayout";
 import { formatMoney, POSITION_ABBREVIATIONS, PATRIMONY_LABELS, PATRIMONY_ICONS, getOverallRating } from "@/lib/gameUtils";
 import { Users, Building2, Coins, Trophy, Dumbbell } from "lucide-react";
