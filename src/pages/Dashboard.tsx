@@ -6,7 +6,11 @@ import GameLayout from "@/components/GameLayout";
 import { formatMoney, POSITION_ABBREVIATIONS, PATRIMONY_LABELS, PATRIMONY_ICONS, getOverallRating } from "@/lib/gameUtils";
 import { Users, Building2, Coins, Trophy, Dumbbell } from "lucide-react";
 
-function StatCard({ icon: Icon, label, value, sub, color = "text-foreground" }: any) {
+import { type LucideIcon } from "lucide-react";
+
+function StatCard({ icon: Icon, label, value, sub, color = "text-foreground" }: {
+  icon: LucideIcon; label: string; value: string; sub?: string; color?: string;
+}) {
   return (
     <div className="bg-glass rounded-xl p-5 flex items-start gap-4">
       <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
