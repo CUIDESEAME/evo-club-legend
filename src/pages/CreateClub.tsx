@@ -104,6 +104,19 @@ const CreateClub = () => {
     setCreating(true);
 
     try {
+      // Check for existing club
+      const { data: existingClub } = await supabase
+        .from("clubs")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (existingClub) {
+        toast.error("Você já possui um clube!");
+        setCreating(false);
+        return;
+      }
+
       // Create club
       const { data: club, error: clubError } = await supabase
         .from("clubs")
