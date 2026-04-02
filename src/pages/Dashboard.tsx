@@ -26,6 +26,7 @@ const Dashboard = () => {
   const { data: club, isLoading: clubLoading } = useClub();
   const { data: players } = usePlayers(club?.id);
   const { data: patrimony } = usePatrimony(club?.id);
+  const { data: stadiumSectors } = useStadiumSectors(club?.id);
 
   if (authLoading || clubLoading) {
     return (
