@@ -17,19 +17,30 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    const { data, error } = await supabase.rpc("process_game_week");
+    // 1. Process game week (salaries, training, construction, juniors)
+    const { data: weekResult, error: weekError } = await supabase.rpc("process_game_week");
 
-    if (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
+    // 2. Simulate matches
+    const { data: matchResult, error: matchError } = await supabase.rpc("simulate_matches");
+
+    const errors = [];
+    if (weekError) errors.push(weekError.message);
+    if (matchError) errors.push(matchError.message);
+
+    if (errors.length > 0) {
+      return new Response(JSON.stringify({ errors, weekResult, matchResult }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    return new Response(JSON.stringify({ success: true, result: data }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ success: true, week: weekResult, matches: matchResult }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err) }), {
       status: 500,
