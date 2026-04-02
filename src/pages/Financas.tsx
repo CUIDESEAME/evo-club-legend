@@ -31,27 +31,20 @@ const Financas = () => {
   const interestRate = isInDebt ? 5 + Math.floor(Math.abs(club.balance) / 500000) : 0;
   const totalSalary = players?.reduce((s, p) => s + p.salary, 0) ?? 0;
   const totalMaintenance = patrimony?.reduce((s, p) => s + p.maintenance_cost, 0) ?? 0;
-  const weeklyExpenses = totalSalary + totalMaintenance;
 
   const takeLoan = async (amount: number) => {
     setLoaning(true);
-    const newBalance = club.balance + amount;
-    const { error } = await supabase.from("clubs").update({ balance: newBalance }).eq("id", club.id);
+    const { error } = await supabase.rpc("take_loan", {
+      p_club_id: club.id,
+      p_amount: amount,
+    });
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
-      setLoaning(false);
-      return;
+    } else {
+      toast({ title: "Empréstimo recebido!", description: `${formatMoney(amount)} adicionados ao caixa.` });
+      queryClient.invalidateQueries({ queryKey: ["club"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
     }
-    await supabase.from("financial_transactions").insert({
-      club_id: club.id,
-      amount,
-      balance_after: newBalance,
-      type: "emprestimo",
-      description: `Empréstimo bancário de ${formatMoney(amount)}`,
-    });
-    toast({ title: "Empréstimo recebido!", description: `${formatMoney(amount)} adicionados ao caixa.` });
-    queryClient.invalidateQueries({ queryKey: ["club"] });
-    queryClient.invalidateQueries({ queryKey: ["transactions"] });
     setLoaning(false);
   };
 
@@ -65,7 +58,6 @@ const Financas = () => {
       <div className="space-y-6">
         <h1 className="font-heading text-3xl font-bold text-foreground">Finanças</h1>
 
-        {/* Balance card */}
         <div className={`rounded-xl p-6 ${isBankrupt ? "bg-destructive/10 border border-destructive/30" : "bg-glass"}`}>
           <div className="flex items-center gap-3 mb-2">
             <Coins size={24} className={club.balance >= 0 ? "text-primary" : "text-destructive"} />
@@ -85,7 +77,6 @@ const Financas = () => {
           )}
         </div>
 
-        {/* Summary cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-glass rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
@@ -117,7 +108,6 @@ const Financas = () => {
           </div>
         </div>
 
-        {/* Loans */}
         <div className="bg-glass rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <Banknote size={20} className="text-accent" />
@@ -143,7 +133,6 @@ const Financas = () => {
           </div>
         </div>
 
-        {/* Transactions */}
         <div className="bg-glass rounded-xl p-6">
           <h2 className="font-heading text-xl font-bold text-foreground mb-4">Extrato</h2>
           {transactions && transactions.length > 0 ? (

@@ -439,7 +439,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      process_game_week: { Args: never; Returns: Json }
+      take_loan: {
+        Args: { p_amount: number; p_club_id: string }
+        Returns: undefined
+      }
+      upgrade_patrimony: {
+        Args: {
+          p_build_weeks: number
+          p_club_id: string
+          p_cost: number
+          p_description: string
+          p_new_level: number
+          p_new_maintenance: number
+          p_patrimony_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       player_position:

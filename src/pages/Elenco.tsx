@@ -51,7 +51,7 @@ const Elenco = () => {
     setActing(false);
   };
 
-  const toggleForSale = async (player: any) => {
+  const toggleForSale = async (player: { id: string; is_for_sale: boolean }) => {
     setActing(true);
     await supabase.from("players").update({ is_for_sale: !player.is_for_sale }).eq("id", player.id);
     toast({ title: player.is_for_sale ? "Removido do mercado" : "Colocado à venda!" });
@@ -59,7 +59,7 @@ const Elenco = () => {
     setActing(false);
   };
 
-  const releasePlayer = async (player: any) => {
+  const releasePlayer = async (player: { id: string; name: string }) => {
     if (!confirm(`Dispensar ${player.name}? Esta ação não pode ser desfeita.`)) return;
     setActing(true);
     await supabase.from("players").delete().eq("id", player.id);

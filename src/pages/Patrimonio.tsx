@@ -44,7 +44,7 @@ const Patrimonio = () => {
   if (!user) return <Navigate to="/auth" replace />;
   if (!club) return <Navigate to="/criar-clube" replace />;
 
-  const handleUpgrade = async (item: any) => {
+  const handleUpgrade = async (item: { id: string; type: string; level: number; max_level: number; construction_weeks_remaining: number }) => {
     if (item.level >= item.max_level) return;
     if (item.construction_weeks_remaining > 0) return;
 
@@ -52,6 +52,7 @@ const Patrimonio = () => {
     const weeks = UPGRADE_WEEKS[item.type] ?? [];
     const cost = costs[item.level] ?? 100000;
     const buildWeeks = weeks[item.level] ?? 2;
+    const newMaintenance = (item.level + 1) * MAINTENANCE_PER_LEVEL;
 
     if (club.balance < cost) {
       toast({ title: "Sem fundos", description: `Você precisa de ${formatMoney(cost)} para esta melhoria.`, variant: "destructive" });
@@ -60,49 +61,24 @@ const Patrimonio = () => {
 
     setUpgrading(item.id);
 
-    // Deduct balance
-    const newBalance = club.balance - cost;
-    const { error: balErr } = await supabase
-      .from("clubs")
-      .update({ balance: newBalance })
-      .eq("id", club.id);
-
-    if (balErr) {
-      toast({ title: "Erro", description: balErr.message, variant: "destructive" });
-      setUpgrading(null);
-      return;
-    }
-
-    // Start construction
-    const newMaintenance = (item.level + 1) * MAINTENANCE_PER_LEVEL;
-    const { error: patErr } = await supabase
-      .from("patrimony")
-      .update({
-        level: item.level + 1,
-        construction_weeks_remaining: buildWeeks,
-        maintenance_cost: newMaintenance,
-      })
-      .eq("id", item.id);
-
-    if (patErr) {
-      toast({ title: "Erro", description: patErr.message, variant: "destructive" });
-      setUpgrading(null);
-      return;
-    }
-
-    // Record transaction
-    await supabase.from("financial_transactions").insert({
-      club_id: club.id,
-      amount: -cost,
-      balance_after: newBalance,
-      type: "patrimonio",
-      description: `Melhoria: ${PATRIMONY_LABELS[item.type] ?? item.type} → Nível ${item.level + 1}`,
+    const { error } = await supabase.rpc("upgrade_patrimony", {
+      p_patrimony_id: item.id,
+      p_club_id: club.id,
+      p_cost: cost,
+      p_build_weeks: buildWeeks,
+      p_new_level: item.level + 1,
+      p_new_maintenance: newMaintenance,
+      p_description: `Melhoria: ${PATRIMONY_LABELS[item.type] ?? item.type} → Nível ${item.level + 1}`,
     });
 
-    toast({ title: "Obra iniciada!", description: `${PATRIMONY_LABELS[item.type]} → Nível ${item.level + 1} (${buildWeeks} semanas)` });
-    queryClient.invalidateQueries({ queryKey: ["patrimony"] });
-    queryClient.invalidateQueries({ queryKey: ["club"] });
-    queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    if (error) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Obra iniciada!", description: `${PATRIMONY_LABELS[item.type]} → Nível ${item.level + 1} (${buildWeeks} semanas)` });
+      queryClient.invalidateQueries({ queryKey: ["patrimony"] });
+      queryClient.invalidateQueries({ queryKey: ["club"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    }
     setUpgrading(null);
   };
 
@@ -140,7 +116,6 @@ const Patrimonio = () => {
                   </div>
                 </div>
 
-                {/* Level bar */}
                 <div className="w-full h-2 bg-secondary rounded-full mb-3">
                   <div
                     className="h-full bg-primary rounded-full transition-all"

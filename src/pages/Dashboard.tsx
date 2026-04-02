@@ -1,12 +1,16 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useClub } from "@/hooks/useClub";
-import { usePlayers, usePatrimony } from "@/hooks/useClub";
+import { usePlayers, usePatrimony, useStadiumSectors } from "@/hooks/useClub";
 import GameLayout from "@/components/GameLayout";
 import { formatMoney, POSITION_ABBREVIATIONS, PATRIMONY_LABELS, PATRIMONY_ICONS, getOverallRating } from "@/lib/gameUtils";
 import { Users, Building2, Coins, Trophy, Dumbbell } from "lucide-react";
 
-function StatCard({ icon: Icon, label, value, sub, color = "text-foreground" }: any) {
+import { type LucideIcon } from "lucide-react";
+
+function StatCard({ icon: Icon, label, value, sub, color = "text-foreground" }: {
+  icon: LucideIcon; label: string; value: string; sub?: string; color?: string;
+}) {
   return (
     <div className="bg-glass rounded-xl p-5 flex items-start gap-4">
       <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -26,6 +30,7 @@ const Dashboard = () => {
   const { data: club, isLoading: clubLoading } = useClub();
   const { data: players } = usePlayers(club?.id);
   const { data: patrimony } = usePatrimony(club?.id);
+  const { data: stadiumSectors } = useStadiumSectors(club?.id);
 
   if (authLoading || clubLoading) {
     return (
@@ -44,7 +49,7 @@ const Dashboard = () => {
     : "0";
   const captain = players?.find(p => p.is_captain);
 
-  const totalCapacity = 800; // default for geral
+  const totalCapacity = stadiumSectors?.reduce((sum, s) => sum + s.capacity, 0) ?? 0;
   const stadiumLevel = patrimony?.find(p => p.type === "estadio")?.level ?? 0;
 
   return (

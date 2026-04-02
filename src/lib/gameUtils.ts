@@ -80,10 +80,14 @@ export function getAttributeColor(value: number): string {
   return "text-gradient-gold";
 }
 
-export function getOverallRating(player: any): number {
+export function getOverallRating(player: {
+  reflexos: number; posicionamento: number; jogo_aereo: number; desarme: number;
+  armacao: number; passe: number; tecnica: number; chute: number;
+  velocidade: number; forca: number; resistencia: number; forma: number;
+}): number {
   const tech = [player.reflexos, player.posicionamento, player.jogo_aereo, player.desarme, player.armacao, player.passe, player.tecnica, player.chute];
   const phys = [player.velocidade, player.forca, player.resistencia, player.forma];
-  const techAvg = tech.reduce((a: number, b: number) => a + b, 0) / tech.length;
-  const physAvg = phys.reduce((a: number, b: number) => a + b, 0) / phys.length;
+  const techAvg = tech.reduce((a, b) => a + b, 0) / tech.length;
+  const physAvg = phys.reduce((a, b) => a + b, 0) / phys.length;
   return Math.round((techAvg * 0.7 + physAvg * 0.3) * 10) / 10;
 }
