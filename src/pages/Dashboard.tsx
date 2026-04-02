@@ -45,7 +45,7 @@ const Dashboard = () => {
     : "0";
   const captain = players?.find(p => p.is_captain);
 
-  const totalCapacity = 800; // default for geral
+  const totalCapacity = stadiumSectors?.reduce((sum, s) => sum + s.capacity, 0) ?? 0;
   const stadiumLevel = patrimony?.find(p => p.type === "estadio")?.level ?? 0;
 
   return (
