@@ -22,8 +22,10 @@ export type Database = {
           division: number
           fans: number
           founded_at: string
+          game_week: number
           id: string
           league: string
+          marketing_budget: number
           members: number
           name: string
           updated_at: string
@@ -36,8 +38,10 @@ export type Database = {
           division?: number
           fans?: number
           founded_at?: string
+          game_week?: number
           id?: string
           league?: string
+          marketing_budget?: number
           members?: number
           name: string
           updated_at?: string
@@ -50,8 +54,10 @@ export type Database = {
           division?: number
           fans?: number
           founded_at?: string
+          game_week?: number
           id?: string
           league?: string
+          marketing_budget?: number
           members?: number
           name?: string
           updated_at?: string
@@ -93,6 +99,45 @@ export type Database = {
             columns: ["club_id"]
             isOneToOne: false
             referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      junior_investments: {
+        Row: {
+          club_id: string
+          created_at: string
+          id: string
+          junior_id: string
+          week_number: number
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          id?: string
+          junior_id: string
+          week_number: number
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          id?: string
+          junior_id?: string
+          week_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "junior_investments_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "junior_investments_junior_id_fkey"
+            columns: ["junior_id"]
+            isOneToOne: false
+            referencedRelation: "juniors"
             referencedColumns: ["id"]
           },
         ]
@@ -671,6 +716,10 @@ export type Database = {
       initialize_season_for_club: {
         Args: { p_club_id: string }
         Returns: string
+      }
+      invest_in_junior: {
+        Args: { p_club_id: string; p_junior_id: string }
+        Returns: Json
       }
       process_game_week: { Args: never; Returns: Json }
       simulate_matches: { Args: never; Returns: Json }
