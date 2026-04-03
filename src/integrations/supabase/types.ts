@@ -667,6 +667,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      end_season: { Args: { p_season_id: string }; Returns: undefined }
       initialize_season_for_club: {
         Args: { p_club_id: string }
         Returns: string
