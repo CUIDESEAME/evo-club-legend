@@ -14,11 +14,13 @@ const BRAZILIAN_NAMES = [
 ];
 
 const FIRST_NAMES = [
-  "Lucas", "Gabriel", "Rafael", "Bruno", "Felipe", "Pedro", "Matheus",
+  "Lucas", "Gabriel", "Bruno", "Felipe", "Pedro", "Matheus",
   "Diego", "Thiago", "André", "Carlos", "Marcos", "Paulo", "Vinicius",
   "Leonardo", "Gustavo", "Eduardo", "Ricardo", "Fernando", "João",
   "Daniel", "Roberto", "Alexandre", "Henrique", "Ronaldo"
 ];
+
+const BANNED_NAMES = ["Rafael Costa"];
 
 const POSITIONS: Array<{ value: string; label: string }> = [
   { value: "goleiro", label: "Goleiro" },
