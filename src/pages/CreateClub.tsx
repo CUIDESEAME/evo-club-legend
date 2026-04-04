@@ -47,7 +47,7 @@ function generatePlayer(position: string, index: number) {
   const physBase = randomInt(3, 6);
 
   return {
-    name: `${firstName} ${lastName}`,
+    name: fullName,
     age,
     position: position as any,
     is_captain: index === 0,

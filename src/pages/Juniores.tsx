@@ -61,7 +61,11 @@ const SKILL_LABELS: Record<string, string> = {
 };
 
 function randomName() {
-  return `${FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)]} ${LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)]}`;
+  let name: string;
+  do {
+    name = `${FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)]} ${LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)]}`;
+  } while (BANNED_NAMES.includes(name));
+  return name;
 }
 
 // Estimate junior potential skills based on quality and talent
