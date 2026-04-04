@@ -14,11 +14,13 @@ const BRAZILIAN_NAMES = [
 ];
 
 const FIRST_NAMES = [
-  "Lucas", "Gabriel", "Rafael", "Bruno", "Felipe", "Pedro", "Matheus",
+  "Lucas", "Gabriel", "Bruno", "Felipe", "Pedro", "Matheus",
   "Diego", "Thiago", "André", "Carlos", "Marcos", "Paulo", "Vinicius",
   "Leonardo", "Gustavo", "Eduardo", "Ricardo", "Fernando", "João",
   "Daniel", "Roberto", "Alexandre", "Henrique", "Ronaldo"
 ];
+
+const BANNED_NAMES = ["Rafael Costa"];
 
 const POSITIONS: Array<{ value: string; label: string }> = [
   { value: "goleiro", label: "Goleiro" },
@@ -34,14 +36,18 @@ function randomInt(min: number, max: number) {
 }
 
 function generatePlayer(position: string, index: number) {
-  const firstName = FIRST_NAMES[randomInt(0, FIRST_NAMES.length - 1)];
-  const lastName = BRAZILIAN_NAMES[randomInt(0, BRAZILIAN_NAMES.length - 1)];
+  let firstName: string, lastName: string, fullName: string;
+  do {
+    firstName = FIRST_NAMES[randomInt(0, FIRST_NAMES.length - 1)];
+    lastName = BRAZILIAN_NAMES[randomInt(0, BRAZILIAN_NAMES.length - 1)];
+    fullName = `${firstName} ${lastName}`;
+  } while (BANNED_NAMES.includes(fullName));
   const age = randomInt(18, 32);
   const baseSkill = randomInt(3, 6);
   const physBase = randomInt(3, 6);
 
   return {
-    name: `${firstName} ${lastName}`,
+    name: fullName,
     age,
     position: position as any,
     is_captain: index === 0,

@@ -47,8 +47,9 @@ function useJuniorInvestments(clubId: string | undefined) {
 }
 
 const POSITIONS = ["goleiro", "zagueiro", "lateral", "volante", "meia", "atacante"] as const;
-const FIRST_NAMES = ["Lucas", "Pedro", "Gabriel", "Rafael", "Felipe", "Matheus", "Bruno", "Diego", "André", "Caio", "Vinícius", "Thiago", "Gustavo", "Igor", "Leonardo"];
+const FIRST_NAMES = ["Lucas", "Pedro", "Gabriel", "Felipe", "Matheus", "Bruno", "Diego", "André", "Caio", "Vinícius", "Thiago", "Gustavo", "Igor", "Leonardo"];
 const LAST_NAMES = ["Silva", "Santos", "Oliveira", "Souza", "Lima", "Pereira", "Costa", "Almeida", "Ferreira", "Rocha", "Nascimento", "Araújo", "Ribeiro", "Cardoso", "Moreira"];
+const BANNED_NAMES = ["Rafael Costa"];
 
 const SKILL_LABELS: Record<string, string> = {
   reflexos: "Reflexos", posicionamento: "Posicionamento", jogo_aereo: "Jogo Aéreo",
@@ -60,7 +61,11 @@ const SKILL_LABELS: Record<string, string> = {
 };
 
 function randomName() {
-  return `${FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)]} ${LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)]}`;
+  let name: string;
+  do {
+    name = `${FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)]} ${LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)]}`;
+  } while (BANNED_NAMES.includes(name));
+  return name;
 }
 
 // Estimate junior potential skills based on quality and talent
