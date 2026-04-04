@@ -36,8 +36,12 @@ function randomInt(min: number, max: number) {
 }
 
 function generatePlayer(position: string, index: number) {
-  const firstName = FIRST_NAMES[randomInt(0, FIRST_NAMES.length - 1)];
-  const lastName = BRAZILIAN_NAMES[randomInt(0, BRAZILIAN_NAMES.length - 1)];
+  let firstName: string, lastName: string, fullName: string;
+  do {
+    firstName = FIRST_NAMES[randomInt(0, FIRST_NAMES.length - 1)];
+    lastName = BRAZILIAN_NAMES[randomInt(0, BRAZILIAN_NAMES.length - 1)];
+    fullName = `${firstName} ${lastName}`;
+  } while (BANNED_NAMES.includes(fullName));
   const age = randomInt(18, 32);
   const baseSkill = randomInt(3, 6);
   const physBase = randomInt(3, 6);
