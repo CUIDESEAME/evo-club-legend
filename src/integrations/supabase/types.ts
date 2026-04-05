@@ -927,7 +927,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      buy_from_closed_market: {
+        Args: { p_club_id: string; p_listing_id: string }
+        Returns: Json
+      }
       end_season: { Args: { p_season_id: string }; Returns: undefined }
+      finalize_auctions: { Args: never; Returns: Json }
       initialize_season_for_club: {
         Args: { p_club_id: string }
         Returns: string
@@ -935,6 +940,14 @@ export type Database = {
       invest_in_junior: {
         Args: { p_club_id: string; p_junior_id: string }
         Returns: Json
+      }
+      list_player_for_sale: {
+        Args: { p_club_id: string; p_min_price: number; p_player_id: string }
+        Returns: string
+      }
+      place_bid: {
+        Args: { p_bid: number; p_club_id: string; p_listing_id: string }
+        Returns: undefined
       }
       process_game_week: { Args: never; Returns: Json }
       simulate_matches: { Args: never; Returns: Json }
