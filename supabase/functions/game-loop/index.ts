@@ -14,18 +14,31 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // 1. Process game week (salaries, training, construction, juniors)
-    const { data: weekResult, error: weekError } = await supabase.rpc("process_game_week");
-
-    // 2. Simulate matches
+    // 1. Always simulate matches (1 round per call, every 60s)
     const { data: matchResult, error: matchError } = await supabase.rpc("simulate_matches");
 
+    // 2. Check if we should process weekly tasks (training, salaries, etc.)
+    // A "game week" = every 2 rounds. Process when current_round is even.
+    const { data: seasons } = await supabase
+      .from("seasons")
+      .select("id, current_round")
+      .eq("status", "active");
+
+    let weekResult = null;
+    let weekError = null;
+    const shouldProcessWeek = seasons?.some(s => s.current_round % 2 === 0);
+
+    if (shouldProcessWeek) {
+      const res = await supabase.rpc("process_game_week");
+      weekResult = res.data;
+      weekError = res.error;
+    }
+
     const errors = [];
-    if (weekError) errors.push(weekError.message);
     if (matchError) errors.push(matchError.message);
+    if (weekError) errors.push(weekError.message);
 
     if (errors.length > 0) {
       return new Response(JSON.stringify({ errors, weekResult, matchResult }), {
@@ -35,7 +48,12 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, week: weekResult, matches: matchResult }),
+      JSON.stringify({
+        success: true,
+        matches: matchResult,
+        week: weekResult,
+        weekProcessed: shouldProcessWeek,
+      }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
