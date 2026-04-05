@@ -24,5 +24,4 @@ function ComingSoon({ title, description }: { title: string; description: string
   );
 }
 
-export const Mercado = () => <ComingSoon title="Mercado" description="Compra, venda e leilões de jogadores." />;
 export const VIP = () => <ComingSoon title="VIP" description="Recursos premium sem pay-to-win." />;

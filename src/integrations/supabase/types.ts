@@ -259,6 +259,200 @@ export type Database = {
           },
         ]
       }
+      lineup_players: {
+        Row: {
+          created_at: string
+          id: string
+          lineup_id: string
+          player_id: string
+          position_override: string | null
+          position_slot: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lineup_id: string
+          player_id: string
+          position_override?: string | null
+          position_slot: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lineup_id?: string
+          player_id?: string
+          position_override?: string | null
+          position_slot?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lineup_players_lineup_id_fkey"
+            columns: ["lineup_id"]
+            isOneToOne: false
+            referencedRelation: "lineups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lineup_players_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lineups: {
+        Row: {
+          club_id: string
+          created_at: string
+          formation: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          formation?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          formation?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lineups_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: true
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      market_closed: {
+        Row: {
+          age: number
+          created_at: string
+          id: string
+          league: string
+          name: string
+          overall: number
+          position: string
+          price: number
+          purchased_at: string | null
+          purchased_by: string | null
+          salary: number
+          stats: Json
+        }
+        Insert: {
+          age: number
+          created_at?: string
+          id?: string
+          league?: string
+          name: string
+          overall?: number
+          position: string
+          price?: number
+          purchased_at?: string | null
+          purchased_by?: string | null
+          salary?: number
+          stats?: Json
+        }
+        Update: {
+          age?: number
+          created_at?: string
+          id?: string
+          league?: string
+          name?: string
+          overall?: number
+          position?: string
+          price?: number
+          purchased_at?: string | null
+          purchased_by?: string | null
+          salary?: number
+          stats?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_closed_purchased_by_fkey"
+            columns: ["purchased_by"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      market_open: {
+        Row: {
+          created_at: string
+          current_bid: number | null
+          current_bidder_club_id: string | null
+          ends_at: string
+          id: string
+          loan_system_pct: number
+          market_fee_pct: number
+          min_price: number
+          player_id: string
+          prize_reserve_pct: number
+          seller_club_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          current_bid?: number | null
+          current_bidder_club_id?: string | null
+          ends_at: string
+          id?: string
+          loan_system_pct?: number
+          market_fee_pct?: number
+          min_price?: number
+          player_id: string
+          prize_reserve_pct?: number
+          seller_club_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          current_bid?: number | null
+          current_bidder_club_id?: string | null
+          ends_at?: string
+          id?: string
+          loan_system_pct?: number
+          market_fee_pct?: number
+          min_price?: number
+          player_id?: string
+          prize_reserve_pct?: number
+          seller_club_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_open_current_bidder_club_id_fkey"
+            columns: ["current_bidder_club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_open_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_open_seller_club_id_fkey"
+            columns: ["seller_club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           away_club_id: string | null
@@ -663,6 +857,27 @@ export type Database = {
           },
         ]
       }
+      system_funds: {
+        Row: {
+          balance: number
+          fund_type: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          balance?: number
+          fund_type: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          fund_type?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       training_config: {
         Row: {
           club_id: string
@@ -712,7 +927,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      buy_from_closed_market: {
+        Args: { p_club_id: string; p_listing_id: string }
+        Returns: Json
+      }
       end_season: { Args: { p_season_id: string }; Returns: undefined }
+      finalize_auctions: { Args: never; Returns: Json }
       initialize_season_for_club: {
         Args: { p_club_id: string }
         Returns: string
@@ -720,6 +940,14 @@ export type Database = {
       invest_in_junior: {
         Args: { p_club_id: string; p_junior_id: string }
         Returns: Json
+      }
+      list_player_for_sale: {
+        Args: { p_club_id: string; p_min_price: number; p_player_id: string }
+        Returns: string
+      }
+      place_bid: {
+        Args: { p_bid: number; p_club_id: string; p_listing_id: string }
+        Returns: undefined
       }
       process_game_week: { Args: never; Returns: Json }
       simulate_matches: { Args: never; Returns: Json }

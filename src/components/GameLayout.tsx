@@ -5,13 +5,14 @@ import { useClub } from "@/hooks/useClub";
 import { formatMoney } from "@/lib/gameUtils";
 import {
   LayoutDashboard, Users, Dumbbell, Building2, Baby, ShoppingCart,
-  Trophy, Swords, Coins, Crown, LogOut, Menu, X
+  Trophy, Swords, Coins, Crown, LogOut, Menu, X, ClipboardList, Edit
 } from "lucide-react";
 import { useState } from "react";
 
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/elenco", icon: Users, label: "Elenco" },
+  { to: "/escalacao", icon: ClipboardList, label: "Escalação" },
   { to: "/treino", icon: Dumbbell, label: "Treino" },
   { to: "/patrimonio", icon: Building2, label: "Patrimônio" },
   { to: "/juniores", icon: Baby, label: "Juniores" },
@@ -19,6 +20,7 @@ const navItems = [
   { to: "/liga", icon: Trophy, label: "Liga" },
   { to: "/partidas", icon: Swords, label: "Partidas" },
   { to: "/financas", icon: Coins, label: "Finanças" },
+  { to: "/admin-editor", icon: Edit, label: "Editor" },
   { to: "/vip", icon: Crown, label: "VIP" },
 ];
 
