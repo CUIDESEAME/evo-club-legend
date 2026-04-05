@@ -15,7 +15,10 @@ import Financas from "./pages/Financas";
 import Juniores from "./pages/Juniores";
 import Liga from "./pages/Liga";
 import Partidas from "./pages/Partidas";
-import { Mercado, VIP } from "./pages/ComingSoon";
+import Mercado from "./pages/Mercado";
+import Escalacao from "./pages/Escalacao";
+import AdminEditor from "./pages/AdminEditor";
+import { VIP } from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +41,8 @@ const App = () => (
             <Route path="/financas" element={<Financas />} />
             <Route path="/juniores" element={<Juniores />} />
             <Route path="/mercado" element={<Mercado />} />
+            <Route path="/escalacao" element={<Escalacao />} />
+            <Route path="/admin-editor" element={<AdminEditor />} />
             <Route path="/liga" element={<Liga />} />
             <Route path="/partidas" element={<Partidas />} />
             <Route path="/vip" element={<VIP />} />
