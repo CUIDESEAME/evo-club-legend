@@ -16,11 +16,13 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // 1. Always simulate matches (1 round per call, every 60s)
+    // 1. Simulate matches (1 round per call, every 60s)
     const { data: matchResult, error: matchError } = await supabase.rpc("simulate_matches");
 
-    // 2. Check if we should process weekly tasks (training, salaries, etc.)
-    // A "game week" = every 2 rounds. Process when current_round is even.
+    // 2. Finalize expired auctions
+    const { data: auctionResult, error: auctionError } = await supabase.rpc("finalize_auctions");
+
+    // 3. Check if we should process weekly tasks (training, salaries, etc.)
     const { data: seasons } = await supabase
       .from("seasons")
       .select("id, current_round")
@@ -39,9 +41,10 @@ Deno.serve(async (req) => {
     const errors = [];
     if (matchError) errors.push(matchError.message);
     if (weekError) errors.push(weekError.message);
+    if (auctionError) errors.push(auctionError.message);
 
     if (errors.length > 0) {
-      return new Response(JSON.stringify({ errors, weekResult, matchResult }), {
+      return new Response(JSON.stringify({ errors, weekResult, matchResult, auctionResult }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -53,6 +56,7 @@ Deno.serve(async (req) => {
         matches: matchResult,
         week: weekResult,
         weekProcessed: shouldProcessWeek,
+        auctions: auctionResult,
       }),
       {
         status: 200,
