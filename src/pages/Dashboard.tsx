@@ -67,25 +67,6 @@ const Dashboard = () => {
   const { data: stadiumSectors } = useStadiumSectors(club?.id);
   const { data: transactions } = useFinancialTransactions(club?.id);
 
-  if (authLoading || clubLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!user) return <Navigate to="/auth" replace />;
-  if (!club) return <Navigate to="/criar-clube" replace />;
-
-  const totalSalary = players?.reduce((sum, p) => sum + p.salary, 0) ?? 0;
-  const avgRating = players?.length
-    ? (players.reduce((sum, p) => sum + getOverallRating(p), 0) / players.length).toFixed(1)
-    : "0";
-
-  const totalCapacity = stadiumSectors?.reduce((sum, s) => sum + s.capacity, 0) ?? 0;
-  const stadiumLevel = patrimony?.find(p => p.type === "estadio")?.level ?? 0;
-
   // Mini balance sheet from last 50 transactions
   const balanceSheet = useMemo(() => {
     if (!transactions?.length) return { income: {} as Record<string, number>, expenses: {} as Record<string, number>, totalIncome: 0, totalExpenses: 0 };
@@ -105,6 +86,25 @@ const Dashboard = () => {
     }
     return { income, expenses, totalIncome, totalExpenses };
   }, [transactions]);
+
+  if (authLoading || clubLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) return <Navigate to="/auth" replace />;
+  if (!club) return <Navigate to="/criar-clube" replace />;
+
+  const totalSalary = players?.reduce((sum, p) => sum + p.salary, 0) ?? 0;
+  const avgRating = players?.length
+    ? (players.reduce((sum, p) => sum + getOverallRating(p), 0) / players.length).toFixed(1)
+    : "0";
+
+  const totalCapacity = stadiumSectors?.reduce((sum, s) => sum + s.capacity, 0) ?? 0;
+  const stadiumLevel = patrimony?.find(p => p.type === "estadio")?.level ?? 0;
 
   const randomNews = SYSTEM_NEWS[Math.floor(Date.now() / 60000) % SYSTEM_NEWS.length];
 
