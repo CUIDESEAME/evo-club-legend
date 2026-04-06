@@ -636,6 +636,7 @@ export type Database = {
           desarme: number
           entrosamento: number
           experiencia: number
+          fadiga: number
           forca: number
           forma: number
           honestidade: number
@@ -675,6 +676,7 @@ export type Database = {
           desarme?: number
           entrosamento?: number
           experiencia?: number
+          fadiga?: number
           forca?: number
           forma?: number
           honestidade?: number
@@ -714,6 +716,7 @@ export type Database = {
           desarme?: number
           entrosamento?: number
           experiencia?: number
+          fadiga?: number
           forca?: number
           forma?: number
           honestidade?: number

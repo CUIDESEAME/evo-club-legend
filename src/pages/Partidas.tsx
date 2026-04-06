@@ -70,40 +70,11 @@ const Partidas = () => {
           </p>
         </div>
 
-        {/* Scheduled matches */}
-        {scheduledMatches.length > 0 && (
-          <div className="bg-glass rounded-xl p-6">
-            <h2 className="font-heading text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-              <Calendar size={18} className="text-accent" />
-              Próximo Jogo
-            </h2>
-            {scheduledMatches.map(m => (
-              <div key={m.id} className="bg-secondary/30 rounded-lg p-4 flex items-center justify-between">
-                <div>
-                  <p className="font-heading text-lg text-foreground">
-                    {isHome(m) ? (
-                      <><span className="text-primary">{club.name}</span> vs {getOpponent(m)}</>
-                    ) : (
-                      <>{getOpponent(m)} vs <span className="text-primary">{club.name}</span></>
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Rodada {m.round} • {isHome(m) ? "🏠 Em casa" : "✈️ Fora"}
-                  </p>
-                </div>
-                <div className="text-xs px-3 py-1 rounded-full bg-accent/10 text-accent font-heading">
-                  AGENDADO
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Match history */}
+        {/* Played matches FIRST */}
         <div className="bg-glass rounded-xl p-6">
           <h2 className="font-heading text-xl font-bold text-foreground mb-4 flex items-center gap-2">
             <Trophy size={18} className="text-accent" />
-            Histórico
+            Partidas Jogadas
           </h2>
 
           {playedMatches.length > 0 ? (
@@ -142,10 +113,41 @@ const Partidas = () => {
             </div>
           ) : (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Nenhuma partida disputada ainda. Aguarde o processamento da rodada.
+              Nenhuma partida disputada ainda.
             </p>
           )}
         </div>
+
+        {/* Scheduled matches BELOW */}
+        {scheduledMatches.length > 0 && (
+          <div className="bg-glass rounded-xl p-6">
+            <h2 className="font-heading text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+              <Calendar size={18} className="text-accent" />
+              Próximas Partidas
+            </h2>
+            <div className="space-y-2">
+              {scheduledMatches.map(m => (
+                <div key={m.id} className="bg-secondary/30 rounded-lg p-4 flex items-center justify-between">
+                  <div>
+                    <p className="font-heading text-lg text-foreground">
+                      {isHome(m) ? (
+                        <><span className="text-primary">{club.name}</span> vs {getOpponent(m)}</>
+                      ) : (
+                        <>{getOpponent(m)} vs <span className="text-primary">{club.name}</span></>
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Rodada {m.round} • {isHome(m) ? "🏠 Em casa" : "✈️ Fora"}
+                    </p>
+                  </div>
+                  <div className="text-xs px-3 py-1 rounded-full bg-accent/10 text-accent font-heading">
+                    AGENDADO
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </GameLayout>
   );

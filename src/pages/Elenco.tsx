@@ -100,9 +100,9 @@ const Elenco = () => {
                       ${selectedId === p.id ? "bg-primary/5" : "hover:bg-secondary/50"}`}
                   >
                     <td className="py-2 text-foreground font-medium">
-                      {p.is_captain && <span className="text-accent mr-1">©</span>}
-                      {p.is_for_sale && <span className="text-primary mr-1">💰</span>}
                       {p.name}
+                      {p.is_captain && <span className="text-accent ml-1">©</span>}
+                      {p.is_for_sale && <span className="text-primary ml-1">💰</span>}
                       {p.is_injured && <span className="text-destructive ml-1">🤕</span>}
                     </td>
                     <td className="text-center">
@@ -130,8 +130,8 @@ const Elenco = () => {
               <div className="space-y-4">
                 <div>
                   <h3 className="font-heading text-xl font-bold text-foreground">
-                    {selected.is_captain && <span className="text-accent mr-1">©</span>}
                     {selected.name}
+                    {selected.is_captain && <span className="text-accent ml-1">©</span>}
                   </h3>
                   <p className="text-sm text-muted-foreground">
                     {POSITION_LABELS[selected.position]} • {selected.age} anos
