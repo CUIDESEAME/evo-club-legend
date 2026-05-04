@@ -18,6 +18,8 @@ import Partidas from "./pages/Partidas";
 import Mercado from "./pages/Mercado";
 import Escalacao from "./pages/Escalacao";
 import AdminEditor from "./pages/AdminEditor";
+import Copas from "./pages/Copas";
+import Banco from "./pages/Banco";
 import { VIP } from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 
@@ -43,6 +45,8 @@ const App = () => (
             <Route path="/mercado" element={<Mercado />} />
             <Route path="/escalacao" element={<Escalacao />} />
             <Route path="/admin-editor" element={<AdminEditor />} />
+            <Route path="/copas" element={<Copas />} />
+            <Route path="/banco" element={<Banco />} />
             <Route path="/liga" element={<Liga />} />
             <Route path="/partidas" element={<Partidas />} />
             <Route path="/vip" element={<VIP />} />
