@@ -65,6 +65,83 @@ export type Database = {
         }
         Relationships: []
       }
+      cup_entries: {
+        Row: {
+          club_id: string
+          cup_id: string
+          id: string
+          prize_received: number
+          reached_phase: string | null
+          registered_at: string
+          status: string
+        }
+        Insert: {
+          club_id: string
+          cup_id: string
+          id?: string
+          prize_received?: number
+          reached_phase?: string | null
+          registered_at?: string
+          status?: string
+        }
+        Update: {
+          club_id?: string
+          cup_id?: string
+          id?: string
+          prize_received?: number
+          reached_phase?: string | null
+          registered_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cup_entries_cup_id_fkey"
+            columns: ["cup_id"]
+            isOneToOne: false
+            referencedRelation: "cups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cups: {
+        Row: {
+          champion_prize: number
+          created_at: string
+          cup_type: string
+          entry_fee: number
+          id: string
+          name: string
+          runner_up_prize: number
+          semifinal_prize: number
+          starts_at: string
+          status: string
+        }
+        Insert: {
+          champion_prize?: number
+          created_at?: string
+          cup_type?: string
+          entry_fee?: number
+          id?: string
+          name: string
+          runner_up_prize?: number
+          semifinal_prize?: number
+          starts_at?: string
+          status?: string
+        }
+        Update: {
+          champion_prize?: number
+          created_at?: string
+          cup_type?: string
+          entry_fee?: number
+          id?: string
+          name?: string
+          runner_up_prize?: number
+          semifinal_prize?: number
+          starts_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       financial_transactions: {
         Row: {
           amount: number
@@ -332,6 +409,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      loans: {
+        Row: {
+          club_id: string
+          created_at: string
+          id: string
+          interest_rate: number
+          paid_amount: number
+          principal: number
+          remaining_weeks: number
+          status: string
+          total_weeks: number
+          updated_at: string
+          weekly_payment: number
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          id?: string
+          interest_rate?: number
+          paid_amount?: number
+          principal: number
+          remaining_weeks: number
+          status?: string
+          total_weeks?: number
+          updated_at?: string
+          weekly_payment: number
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          id?: string
+          interest_rate?: number
+          paid_amount?: number
+          principal?: number
+          remaining_weeks?: number
+          status?: string
+          total_weeks?: number
+          updated_at?: string
+          weekly_payment?: number
+        }
+        Relationships: []
       }
       market_closed: {
         Row: {
@@ -953,6 +1072,18 @@ export type Database = {
         Returns: undefined
       }
       process_game_week: { Args: never; Returns: Json }
+      register_cup: {
+        Args: { p_club_id: string; p_cup_id: string }
+        Returns: Json
+      }
+      repay_loan: {
+        Args: { p_club_id: string; p_loan_id: string }
+        Returns: Json
+      }
+      request_loan: {
+        Args: { p_amount: number; p_club_id: string; p_weeks: number }
+        Returns: Json
+      }
       simulate_matches: { Args: never; Returns: Json }
       take_loan: {
         Args: { p_amount: number; p_club_id: string }

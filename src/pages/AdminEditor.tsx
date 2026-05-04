@@ -69,7 +69,7 @@ const AdminEditor = () => {
     setSaving(true);
     const { error } = await supabase
       .from("players")
-      .update(edits)
+      .update(edits as any)
       .eq("id", selectedId);
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
