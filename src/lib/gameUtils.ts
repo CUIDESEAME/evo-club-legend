@@ -51,6 +51,9 @@ export const PATRIMONY_LABELS: Record<string, string> = {
   marketing: "Marketing",
   clube_social: "Clube Social",
   lojas: "Lojas",
+  psicologia: "Psicologia",
+  escola: "Escola",
+  funcionarios: "Funcionários",
 };
 
 export const PATRIMONY_ICONS: Record<string, string> = {
@@ -61,6 +64,9 @@ export const PATRIMONY_ICONS: Record<string, string> = {
   marketing: "📢",
   clube_social: "🎉",
   lojas: "🛍️",
+  psicologia: "🧠",
+  escola: "📚",
+  funcionarios: "👔",
 };
 
 export function formatMoney(cents: number): string {
