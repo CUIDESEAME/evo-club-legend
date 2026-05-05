@@ -7,6 +7,8 @@ import { formatMoney, POSITION_ABBREVIATIONS, PATRIMONY_LABELS, PATRIMONY_ICONS,
 import { Users, Building2, Coins, Trophy, TrendingUp, TrendingDown, Newspaper } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 function StatCard({ icon: Icon, label, value, sub, color = "text-foreground" }: {
   icon: LucideIcon; label: string; value: string; sub?: string; color?: string;
@@ -66,6 +68,21 @@ const Dashboard = () => {
   const { data: patrimony } = usePatrimony(club?.id);
   const { data: stadiumSectors } = useStadiumSectors(club?.id);
   const { data: transactions } = useFinancialTransactions(club?.id);
+
+  const { data: discEvents } = useQuery({
+    queryKey: ["disciplinary", club?.id],
+    queryFn: async () => {
+      if (!club) return [];
+      const { data } = await supabase
+        .from("disciplinary_events")
+        .select("*")
+        .eq("club_id", club.id)
+        .order("created_at", { ascending: false })
+        .limit(8);
+      return data ?? [];
+    },
+    enabled: !!club,
+  });
 
   // Mini balance sheet from last 50 transactions
   const balanceSheet = useMemo(() => {
@@ -284,6 +301,24 @@ const Dashboard = () => {
             ))}
           </div>
         </div>
+
+        {/* Disciplinary events */}
+        {discEvents && discEvents.length > 0 && (
+          <div className="bg-glass rounded-xl p-6">
+            <h2 className="font-heading text-xl font-bold text-foreground mb-3">⚠️ Histórico Disciplinar</h2>
+            <div className="space-y-2">
+              {discEvents.map(e => (
+                <div key={e.id} className="flex items-center justify-between text-sm border-b border-border/40 pb-2">
+                  <span className="text-foreground">{e.description}</span>
+                  <span className="text-destructive font-heading text-xs whitespace-nowrap ml-4">
+                    {e.fine_amount > 0 ? `-${formatMoney(e.fine_amount)}` : ""}
+                    {e.weeks_suspended > 0 ? ` • ${e.weeks_suspended}sem` : ""}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </GameLayout>
   );
