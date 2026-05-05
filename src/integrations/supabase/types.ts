@@ -103,6 +103,45 @@ export type Database = {
           },
         ]
       }
+      cup_matches: {
+        Row: {
+          away_club_id: string | null
+          away_score: number | null
+          created_at: string
+          cup_id: string
+          home_club_id: string | null
+          home_score: number | null
+          id: string
+          phase: string
+          played_at: string | null
+          status: string
+        }
+        Insert: {
+          away_club_id?: string | null
+          away_score?: number | null
+          created_at?: string
+          cup_id: string
+          home_club_id?: string | null
+          home_score?: number | null
+          id?: string
+          phase: string
+          played_at?: string | null
+          status?: string
+        }
+        Update: {
+          away_club_id?: string | null
+          away_score?: number | null
+          created_at?: string
+          cup_id?: string
+          home_club_id?: string | null
+          home_score?: number | null
+          id?: string
+          phase?: string
+          played_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       cups: {
         Row: {
           champion_prize: number
@@ -139,6 +178,39 @@ export type Database = {
           semifinal_prize?: number
           starts_at?: string
           status?: string
+        }
+        Relationships: []
+      }
+      disciplinary_events: {
+        Row: {
+          club_id: string
+          created_at: string
+          description: string
+          event_type: string
+          fine_amount: number
+          id: string
+          player_id: string
+          weeks_suspended: number
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          description: string
+          event_type: string
+          fine_amount?: number
+          id?: string
+          player_id: string
+          weeks_suspended?: number
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          description?: string
+          event_type?: string
+          fine_amount?: number
+          id?: string
+          player_id?: string
+          weeks_suspended?: number
         }
         Relationships: []
       }
@@ -1073,6 +1145,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      advance_cup_phase: { Args: { p_cup_id: string }; Returns: Json }
       buy_from_closed_market: {
         Args: { p_club_id: string; p_listing_id: string }
         Returns: Json
@@ -1096,6 +1169,8 @@ export type Database = {
         Args: { p_bid: number; p_club_id: string; p_listing_id: string }
         Returns: undefined
       }
+      process_agent_negotiations: { Args: never; Returns: undefined }
+      process_disciplinary_events: { Args: never; Returns: undefined }
       process_game_week: { Args: never; Returns: Json }
       refill_closed_market: { Args: never; Returns: Json }
       register_cup: {
