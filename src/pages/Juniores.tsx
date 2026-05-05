@@ -255,6 +255,33 @@ const Juniores = () => {
           <p>• Saem com 16, 17 ou 18 anos</p>
         </div>
 
+        <div className="bg-glass rounded-xl p-4 space-y-3">
+          <h3 className="font-heading text-sm font-bold text-foreground flex items-center gap-2">
+            <Search size={14} /> Scouting (4 tiers)
+          </h3>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            {[
+              { tier: "basico", label: "Básico", cost: "R$10k", desc: "1-3⭐ • T1-4" },
+              { tier: "regional", label: "Regional", cost: "R$50k", desc: "2-4⭐ • T2-6" },
+              { tier: "nacional", label: "Nacional", cost: "R$200k", desc: "3-5⭐ • T4-9" },
+              { tier: "internacional", label: "Internacional", cost: "R$800k", desc: "4-6⭐ • T6-14" },
+            ].map(t => (
+              <Button
+                key={t.tier}
+                size="sm"
+                variant="outline"
+                disabled={!!scouting || (juniors?.length ?? 0) >= maxJuniors}
+                onClick={() => scoutTier(t.tier as any)}
+                className="font-heading flex-col h-auto py-2"
+              >
+                <span>{t.label}</span>
+                <span className="text-[10px] text-muted-foreground">{t.cost}</span>
+                <span className="text-[10px] text-muted-foreground">{t.desc}</span>
+              </Button>
+            ))}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {juniors?.map(j => {
             const skills = estimateSkills(j);
