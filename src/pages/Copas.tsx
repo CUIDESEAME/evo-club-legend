@@ -35,6 +35,21 @@ const Copas = () => {
     enabled: !!club,
   });
 
+  const { data: cupMatches } = useQuery({
+    queryKey: ["cup_matches", club?.id],
+    queryFn: async () => {
+      if (!club) return [];
+      const { data } = await supabase
+        .from("cup_matches")
+        .select("*")
+        .or(`home_club_id.eq.${club.id},away_club_id.eq.${club.id}`)
+        .order("created_at", { ascending: false })
+        .limit(10);
+      return data ?? [];
+    },
+    enabled: !!club,
+  });
+
   if (authLoading || isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
   if (!user) return <Navigate to="/auth" replace />;
   if (!club) return <Navigate to="/criar-clube" replace />;
@@ -92,6 +107,22 @@ const Copas = () => {
             );
           })}
         </div>
+
+        {cupMatches && cupMatches.length > 0 && (
+          <div className="bg-glass rounded-xl p-6">
+            <h2 className="font-heading text-xl font-bold text-foreground mb-3">Seus jogos de copa</h2>
+            <div className="space-y-2">
+              {cupMatches.map(m => (
+                <div key={m.id} className="flex justify-between items-center text-sm border-b border-border/40 pb-2">
+                  <span className="text-muted-foreground uppercase text-xs">{m.phase}</span>
+                  <span className="text-foreground font-heading">
+                    {m.status === "played" ? `${m.home_score} x ${m.away_score}` : "Agendado"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </GameLayout>
   );
