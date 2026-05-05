@@ -28,6 +28,19 @@ Deno.serve(async (req) => {
     // 2c. Refill closed market with players for each league
     await supabase.rpc("refill_closed_market");
 
+    // 2d. Disciplinary events + agent renegotiations
+    await supabase.rpc("process_disciplinary_events");
+    await supabase.rpc("process_agent_negotiations");
+
+    // 2e. Advance any in-progress cups
+    const { data: activeCups } = await supabase
+      .from("cups")
+      .select("id")
+      .in("status", ["open", "in_progress"]);
+    for (const cup of activeCups ?? []) {
+      await supabase.rpc("advance_cup_phase", { p_cup_id: cup.id });
+    }
+
     // 3. Check if we should process weekly tasks (training, salaries, etc.)
     const { data: seasons } = await supabase
       .from("seasons")
