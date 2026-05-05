@@ -22,6 +22,12 @@ Deno.serve(async (req) => {
     // 2. Finalize expired auctions
     const { data: auctionResult, error: auctionError } = await supabase.rpc("finalize_auctions");
 
+    // 2b. NPC auto-bidding to keep auctions lively
+    await supabase.rpc("npc_auto_bid");
+
+    // 2c. Refill closed market with players for each league
+    await supabase.rpc("refill_closed_market");
+
     // 3. Check if we should process weekly tasks (training, salaries, etc.)
     const { data: seasons } = await supabase
       .from("seasons")
