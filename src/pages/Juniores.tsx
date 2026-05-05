@@ -8,7 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Baby, ArrowUp, Eye, EyeOff, Trash2, Coins } from "lucide-react";
+import { Baby, ArrowUp, Eye, EyeOff, Trash2, Coins, Search } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Junior = Tables<"juniors">;
@@ -103,6 +103,7 @@ const Juniores = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [acting, setActing] = useState(false);
+  const [scouting, setScouting] = useState<string | null>(null);
 
   if (authLoading || isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
   if (!user) return <Navigate to="/auth" replace />;
@@ -135,6 +136,20 @@ const Juniores = () => {
     else toast({ title: "Novo junior na base!" });
     queryClient.invalidateQueries({ queryKey: ["juniors"] });
     setActing(false);
+  };
+
+  const scoutTier = async (tier: "basico" | "regional" | "nacional" | "internacional") => {
+    setScouting(tier);
+    const { data, error } = await supabase.rpc("scout_junior", { p_club_id: club.id, p_tier: tier });
+    if (error) toast({ title: "Erro", description: error.message, variant: "destructive" });
+    else {
+      const r = data as { name: string; quality: number; talent: number; cost: number };
+      toast({ title: `Olheiro ${tier}: ${r.name}`, description: `Qual ${r.quality}⭐ • Talento ${r.talent} • -${formatMoney(r.cost)}` });
+      queryClient.invalidateQueries({ queryKey: ["juniors"] });
+      queryClient.invalidateQueries({ queryKey: ["club"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    }
+    setScouting(null);
   };
 
   const investInJunior = async (junior: Junior) => {
