@@ -8,7 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Baby, ArrowUp, Eye, EyeOff, Trash2, Coins } from "lucide-react";
+import { Baby, ArrowUp, Eye, EyeOff, Trash2, Coins, Search } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Junior = Tables<"juniors">;
@@ -103,6 +103,7 @@ const Juniores = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [acting, setActing] = useState(false);
+  const [scouting, setScouting] = useState<string | null>(null);
 
   if (authLoading || isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
   if (!user) return <Navigate to="/auth" replace />;
@@ -135,6 +136,20 @@ const Juniores = () => {
     else toast({ title: "Novo junior na base!" });
     queryClient.invalidateQueries({ queryKey: ["juniors"] });
     setActing(false);
+  };
+
+  const scoutTier = async (tier: "basico" | "regional" | "nacional" | "internacional") => {
+    setScouting(tier);
+    const { data, error } = await supabase.rpc("scout_junior", { p_club_id: club.id, p_tier: tier });
+    if (error) toast({ title: "Erro", description: error.message, variant: "destructive" });
+    else {
+      const r = data as { name: string; quality: number; talent: number; cost: number };
+      toast({ title: `Olheiro ${tier}: ${r.name}`, description: `Qual ${r.quality}⭐ • Talento ${r.talent} • -${formatMoney(r.cost)}` });
+      queryClient.invalidateQueries({ queryKey: ["juniors"] });
+      queryClient.invalidateQueries({ queryKey: ["club"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    }
+    setScouting(null);
   };
 
   const investInJunior = async (junior: Junior) => {
@@ -238,6 +253,33 @@ const Juniores = () => {
           <p>• Investir custa R$ 15.000 (máx 1x por júnior por semana, sem garantia)</p>
           <p>• A promoção só é possível após a revelação do talento</p>
           <p>• Saem com 16, 17 ou 18 anos</p>
+        </div>
+
+        <div className="bg-glass rounded-xl p-4 space-y-3">
+          <h3 className="font-heading text-sm font-bold text-foreground flex items-center gap-2">
+            <Search size={14} /> Scouting (4 tiers)
+          </h3>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            {[
+              { tier: "basico", label: "Básico", cost: "R$10k", desc: "1-3⭐ • T1-4" },
+              { tier: "regional", label: "Regional", cost: "R$50k", desc: "2-4⭐ • T2-6" },
+              { tier: "nacional", label: "Nacional", cost: "R$200k", desc: "3-5⭐ • T4-9" },
+              { tier: "internacional", label: "Internacional", cost: "R$800k", desc: "4-6⭐ • T6-14" },
+            ].map(t => (
+              <Button
+                key={t.tier}
+                size="sm"
+                variant="outline"
+                disabled={!!scouting || (juniors?.length ?? 0) >= maxJuniors}
+                onClick={() => scoutTier(t.tier as any)}
+                className="font-heading flex-col h-auto py-2"
+              >
+                <span>{t.label}</span>
+                <span className="text-[10px] text-muted-foreground">{t.cost}</span>
+                <span className="text-[10px] text-muted-foreground">{t.desc}</span>
+              </Button>
+            ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

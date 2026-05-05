@@ -744,6 +744,30 @@ export type Database = {
           },
         ]
       }
+      player_agents: {
+        Row: {
+          agent_name: string
+          fee_pct: number
+          id: string
+          player_id: string
+          signed_at: string
+        }
+        Insert: {
+          agent_name: string
+          fee_pct?: number
+          id?: string
+          player_id: string
+          signed_at?: string
+        }
+        Update: {
+          agent_name?: string
+          fee_pct?: number
+          id?: string
+          player_id?: string
+          signed_at?: string
+        }
+        Relationships: []
+      }
       players: {
         Row: {
           age: number
@@ -1067,11 +1091,13 @@ export type Database = {
         Args: { p_club_id: string; p_min_price: number; p_player_id: string }
         Returns: string
       }
+      npc_auto_bid: { Args: never; Returns: Json }
       place_bid: {
         Args: { p_bid: number; p_club_id: string; p_listing_id: string }
         Returns: undefined
       }
       process_game_week: { Args: never; Returns: Json }
+      refill_closed_market: { Args: never; Returns: Json }
       register_cup: {
         Args: { p_club_id: string; p_cup_id: string }
         Returns: Json
@@ -1082,6 +1108,10 @@ export type Database = {
       }
       request_loan: {
         Args: { p_amount: number; p_club_id: string; p_weeks: number }
+        Returns: Json
+      }
+      scout_junior: {
+        Args: { p_club_id: string; p_tier: string }
         Returns: Json
       }
       simulate_matches: { Args: never; Returns: Json }
