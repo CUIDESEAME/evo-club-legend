@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Landmark, TrendingDown, CheckCircle2 } from "lucide-react";
+import { Landmark, TrendingDown, CheckCircle2, PiggyBank } from "lucide-react";
 import { useState } from "react";
 
 const Banco = () => {
@@ -18,6 +18,9 @@ const Banco = () => {
   const [amount, setAmount] = useState(100000);
   const [weeks, setWeeks] = useState(20);
   const [submitting, setSubmitting] = useState(false);
+  const [depAmount, setDepAmount] = useState(50000);
+  const [depWeeks, setDepWeeks] = useState(20);
+  const [depositing, setDepositing] = useState(false);
 
   const { data: loans } = useQuery({
     queryKey: ["loans", club?.id],
@@ -35,6 +38,16 @@ const Banco = () => {
       const { data } = await supabase.from("system_funds").select("*").eq("fund_type", "loan_system").maybeSingle();
       return data;
     },
+  });
+
+  const { data: deposits } = useQuery({
+    queryKey: ["bank_deposits", club?.id],
+    queryFn: async () => {
+      if (!club) return [];
+      const { data } = await supabase.from("bank_deposits").select("*").eq("club_id", club.id).order("created_at", { ascending: false });
+      return data ?? [];
+    },
+    enabled: !!club,
   });
 
   if (authLoading || isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
@@ -67,6 +80,21 @@ const Banco = () => {
       queryClient.invalidateQueries({ queryKey: ["club"] });
     }
   };
+
+  const createDeposit = async () => {
+    setDepositing(true);
+    const { error } = await supabase.rpc("create_bank_deposit", { p_club_id: club.id, p_amount: depAmount, p_weeks: depWeeks });
+    if (error) toast({ title: "Erro", description: error.message, variant: "destructive" });
+    else {
+      toast({ title: "Depósito realizado!" });
+      queryClient.invalidateQueries({ queryKey: ["bank_deposits"] });
+      queryClient.invalidateQueries({ queryKey: ["club"] });
+    }
+    setDepositing(false);
+  };
+
+  const depRate = depWeeks >= 52 ? 8 : depWeeks >= 20 ? 6 : 4;
+  const depPayout = depAmount + Math.floor(depAmount * depRate * depWeeks / 5200);
 
   return (
     <GameLayout>
@@ -125,6 +153,44 @@ const Banco = () => {
               )}
             </div>
           ))}
+        </div>
+
+        <div className="bg-glass rounded-xl p-6">
+          <h2 className="font-heading text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+            <PiggyBank size={18} className="text-primary" /> Depósito a prazo
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="text-xs text-muted-foreground">Valor (mín R$10k)</label>
+              <input type="number" min={10000} step={10000}
+                className="w-full bg-secondary text-foreground rounded p-2 border border-border/30"
+                value={depAmount} onChange={e => setDepAmount(parseInt(e.target.value) || 0)} />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Prazo (4-104 sem)</label>
+              <input type="number" min={4} max={104}
+                className="w-full bg-secondary text-foreground rounded p-2 border border-border/30"
+                value={depWeeks} onChange={e => setDepWeeks(parseInt(e.target.value) || 4)} />
+            </div>
+          </div>
+          <div className="bg-secondary/50 rounded-lg p-3 mb-4 text-sm space-y-1">
+            <div className="flex justify-between"><span className="text-muted-foreground">Juros anual:</span><span className="text-foreground">{depRate}%</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Resgate na maturidade:</span><span className="text-primary font-heading">{formatMoney(depPayout)}</span></div>
+          </div>
+          <Button onClick={createDeposit} disabled={depositing} className="w-full font-heading">
+            {depositing ? "Processando..." : "Aplicar"}
+          </Button>
+
+          {deposits && deposits.length > 0 && (
+            <div className="mt-4 space-y-2">
+              {deposits.map(d => (
+                <div key={d.id} className="flex items-center justify-between text-xs border-t border-border/30 pt-2">
+                  <span className="text-foreground font-heading">{formatMoney(d.principal)} • {d.interest_rate}% • {d.weeks}sem</span>
+                  <span className="text-muted-foreground">{d.status === "active" ? `${d.weeks_remaining} sem restantes` : "resgatado"}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </GameLayout>
