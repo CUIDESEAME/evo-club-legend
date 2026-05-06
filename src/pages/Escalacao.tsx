@@ -31,6 +31,9 @@ const Escalacao = () => {
   const [slots, setSlots] = useState<(string | null)[]>(Array(11).fill(null));
   const [saving, setSaving] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const [passingStyle, setPassingStyle] = useState("equilibrado");
+  const [markingStyle, setMarkingStyle] = useState("zona");
+  const [positioningStyle, setPositioningStyle] = useState("equilibrado");
 
   if (authLoading || isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
   if (!user) return <Navigate to="/auth" replace />;
@@ -39,6 +42,9 @@ const Escalacao = () => {
   // Load existing lineup once
   if (!initialized && !lineupLoading && lineup) {
     setFormation(lineup.formation);
+    setPassingStyle((lineup as any).passing_style ?? "equilibrado");
+    setMarkingStyle((lineup as any).marking_style ?? "zona");
+    setPositioningStyle((lineup as any).positioning_style ?? "equilibrado");
     const loadedSlots = Array(11).fill(null);
     lineup.players?.forEach((lp: any) => {
       if (lp.position_slot >= 1 && lp.position_slot <= 11) {
@@ -100,7 +106,11 @@ const Escalacao = () => {
       // Upsert lineup
       const { data: lineupData, error: lineupError } = await supabase
         .from("lineups")
-        .upsert({ club_id: club.id, formation, updated_at: new Date().toISOString() }, { onConflict: "club_id" })
+        .upsert({
+          club_id: club.id, formation,
+          passing_style: passingStyle, marking_style: markingStyle, positioning_style: positioningStyle,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "club_id" })
         .select("id")
         .single();
 
@@ -158,6 +168,37 @@ const Escalacao = () => {
               {f}
             </Button>
           ))}
+        </div>
+
+        {/* Tactical styles */}
+        <div className="bg-glass rounded-xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground">Estilo de passe</label>
+            <select className="w-full bg-secondary text-foreground rounded p-2 border border-border/30 text-sm"
+              value={passingStyle} onChange={e => setPassingStyle(e.target.value)}>
+              <option value="curto">Curto</option>
+              <option value="equilibrado">Equilibrado</option>
+              <option value="longo">Longo</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">Estilo de marcação</label>
+            <select className="w-full bg-secondary text-foreground rounded p-2 border border-border/30 text-sm"
+              value={markingStyle} onChange={e => setMarkingStyle(e.target.value)}>
+              <option value="zona">Zona</option>
+              <option value="individual">Individual</option>
+              <option value="pressao">Pressão alta</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">Posicionamento</label>
+            <select className="w-full bg-secondary text-foreground rounded p-2 border border-border/30 text-sm"
+              value={positioningStyle} onChange={e => setPositioningStyle(e.target.value)}>
+              <option value="defensivo">Defensivo</option>
+              <option value="equilibrado">Equilibrado</option>
+              <option value="ofensivo">Ofensivo</option>
+            </select>
+          </div>
         </div>
 
         {/* Slots grid */}

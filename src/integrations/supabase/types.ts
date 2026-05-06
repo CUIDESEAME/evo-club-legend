@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      bank_deposits: {
+        Row: {
+          club_id: string
+          created_at: string
+          id: string
+          interest_rate: number
+          matured_at: string | null
+          principal: number
+          status: string
+          weeks: number
+          weeks_remaining: number
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          id?: string
+          interest_rate?: number
+          matured_at?: string | null
+          principal: number
+          status?: string
+          weeks: number
+          weeks_remaining: number
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          id?: string
+          interest_rate?: number
+          matured_at?: string | null
+          principal?: number
+          status?: string
+          weeks?: number
+          weeks_remaining?: number
+        }
+        Relationships: []
+      }
+      club_trophies: {
+        Row: {
+          club_id: string
+          competition_name: string
+          created_at: string
+          id: string
+          position: string
+          season_number: number
+          trophy_type: string
+        }
+        Insert: {
+          club_id: string
+          competition_name: string
+          created_at?: string
+          id?: string
+          position?: string
+          season_number: number
+          trophy_type: string
+        }
+        Update: {
+          club_id?: string
+          competition_name?: string
+          created_at?: string
+          id?: string
+          position?: string
+          season_number?: number
+          trophy_type?: string
+        }
+        Relationships: []
+      }
       clubs: {
         Row: {
           abbreviation: string
@@ -456,6 +522,9 @@ export type Database = {
           created_at: string
           formation: string
           id: string
+          marking_style: string
+          passing_style: string
+          positioning_style: string
           updated_at: string
         }
         Insert: {
@@ -463,6 +532,9 @@ export type Database = {
           created_at?: string
           formation?: string
           id?: string
+          marking_style?: string
+          passing_style?: string
+          positioning_style?: string
           updated_at?: string
         }
         Update: {
@@ -470,6 +542,9 @@ export type Database = {
           created_at?: string
           formation?: string
           id?: string
+          marking_style?: string
+          passing_style?: string
+          positioning_style?: string
           updated_at?: string
         }
         Relationships: [
@@ -1146,8 +1221,13 @@ export type Database = {
     }
     Functions: {
       advance_cup_phase: { Args: { p_cup_id: string }; Returns: Json }
+      advance_season: { Args: { p_season_id: string }; Returns: Json }
       buy_from_closed_market: {
         Args: { p_club_id: string; p_listing_id: string }
+        Returns: Json
+      }
+      create_bank_deposit: {
+        Args: { p_amount: number; p_club_id: string; p_weeks: number }
         Returns: Json
       }
       end_season: { Args: { p_season_id: string }; Returns: undefined }
@@ -1170,6 +1250,7 @@ export type Database = {
         Returns: undefined
       }
       process_agent_negotiations: { Args: never; Returns: undefined }
+      process_bank_deposits: { Args: never; Returns: Json }
       process_disciplinary_events: { Args: never; Returns: undefined }
       process_game_week: { Args: never; Returns: Json }
       process_sporadic_events: { Args: never; Returns: Json }
@@ -1186,6 +1267,7 @@ export type Database = {
         Args: { p_amount: number; p_club_id: string; p_weeks: number }
         Returns: Json
       }
+      retire_player: { Args: { p_player_id: string }; Returns: Json }
       scout_junior: {
         Args: { p_club_id: string; p_tier: string }
         Returns: Json

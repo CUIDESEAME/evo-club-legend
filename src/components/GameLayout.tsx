@@ -5,7 +5,7 @@ import { useClub } from "@/hooks/useClub";
 import { formatMoney } from "@/lib/gameUtils";
 import {
   LayoutDashboard, Users, Dumbbell, Building2, Baby, ShoppingCart,
-  Trophy, Swords, Coins, Crown, LogOut, Menu, X, ClipboardList, Edit, Award, Landmark
+  Trophy, Swords, Coins, Crown, LogOut, Menu, X, ClipboardList, Edit, Award, Landmark, Medal
 } from "lucide-react";
 import { useState } from "react";
 
@@ -19,6 +19,7 @@ const navItems = [
   { to: "/mercado", icon: ShoppingCart, label: "Mercado" },
   { to: "/liga", icon: Trophy, label: "Liga" },
   { to: "/copas", icon: Award, label: "Copas" },
+  { to: "/trofeus", icon: Medal, label: "Troféus" },
   { to: "/partidas", icon: Swords, label: "Partidas" },
   { to: "/financas", icon: Coins, label: "Finanças" },
   { to: "/banco", icon: Landmark, label: "Banco" },
