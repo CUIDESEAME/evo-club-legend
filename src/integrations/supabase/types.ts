@@ -1172,6 +1172,7 @@ export type Database = {
       process_agent_negotiations: { Args: never; Returns: undefined }
       process_disciplinary_events: { Args: never; Returns: undefined }
       process_game_week: { Args: never; Returns: Json }
+      process_sporadic_events: { Args: never; Returns: Json }
       refill_closed_market: { Args: never; Returns: Json }
       register_cup: {
         Args: { p_club_id: string; p_cup_id: string }
