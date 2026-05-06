@@ -31,6 +31,7 @@ Deno.serve(async (req) => {
     // 2d. Disciplinary events + agent renegotiations
     await supabase.rpc("process_disciplinary_events");
     await supabase.rpc("process_agent_negotiations");
+    await supabase.rpc("process_sporadic_events");
 
     // 2e. Advance any in-progress cups
     const { data: activeCups } = await supabase
