@@ -20,6 +20,7 @@ import Escalacao from "./pages/Escalacao";
 import AdminEditor from "./pages/AdminEditor";
 import Copas from "./pages/Copas";
 import Banco from "./pages/Banco";
+import Trofeus from "./pages/Trofeus";
 import { VIP } from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/admin-editor" element={<AdminEditor />} />
             <Route path="/copas" element={<Copas />} />
             <Route path="/banco" element={<Banco />} />
+            <Route path="/trofeus" element={<Trofeus />} />
             <Route path="/liga" element={<Liga />} />
             <Route path="/partidas" element={<Partidas />} />
             <Route path="/vip" element={<VIP />} />
