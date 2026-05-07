@@ -58,6 +58,7 @@ const Banco = () => {
   const total = amount + (amount * interestRate / 100);
   const weekly = Math.floor(total / weeks);
   const activeLoans = loans?.filter(l => l.status === "active") ?? [];
+  const totalDebt = activeLoans.reduce((s, l) => s + l.weekly_payment * l.remaining_weeks, 0);
 
   const requestLoan = async () => {
     setSubmitting(true);
@@ -103,7 +104,10 @@ const Banco = () => {
           <Landmark className="text-accent" size={32} />
           <div>
             <h1 className="font-heading text-3xl font-bold text-foreground">Banco</h1>
-            <p className="text-sm text-muted-foreground">Fundo disponível: <span className="text-accent font-heading">{formatMoney(fund?.balance ?? 0)}</span></p>
+            <p className="text-sm text-muted-foreground">
+              Fundo disponível: <span className="text-accent font-heading">{formatMoney(fund?.balance ?? 0)}</span>
+              {" • "}Dívida total: <span className={totalDebt > 0 ? "text-destructive font-heading" : "text-primary font-heading"}>{formatMoney(totalDebt)}</span>
+            </p>
           </div>
         </div>
 

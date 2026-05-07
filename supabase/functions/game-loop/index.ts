@@ -43,6 +43,17 @@ Deno.serve(async (req) => {
       await supabase.rpc("advance_cup_phase", { p_cup_id: cup.id });
     }
 
+    // 2f. Auto end-season when all rounds are played
+    const { data: finishedSeasons } = await supabase
+      .from("seasons")
+      .select("id, current_round, total_rounds")
+      .eq("status", "active");
+    for (const s of finishedSeasons ?? []) {
+      if (s.current_round > s.total_rounds) {
+        await supabase.rpc("end_season", { p_season_id: s.id });
+      }
+    }
+
     // 3. Check if we should process weekly tasks (training, salaries, etc.)
     const { data: seasons } = await supabase
       .from("seasons")
