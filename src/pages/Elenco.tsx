@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Star, DollarSign, UserX, Shield } from "lucide-react";
+import { Star, DollarSign, UserX, Shield, LogOut } from "lucide-react";
 
 const TECH_ATTRS = ["reflexos", "posicionamento", "jogo_aereo", "desarme", "armacao", "passe", "tecnica", "chute"] as const;
 const PHYS_ATTRS = ["velocidade", "forca", "resistencia", "forma"] as const;
@@ -66,6 +66,24 @@ const Elenco = () => {
     toast({ title: `${player.name} dispensado`, variant: "destructive" });
     setSelectedId(null);
     queryClient.invalidateQueries({ queryKey: ["players"] });
+    setActing(false);
+  };
+
+  const retire = async (player: { id: string; name: string; age: number }) => {
+    if (player.age < 32) {
+      toast({ title: "Apenas jogadores com 32+ anos podem se aposentar", variant: "destructive" });
+      return;
+    }
+    if (!confirm(`${player.name} vai pendurar as chuteiras. Confirmar aposentadoria?`)) return;
+    setActing(true);
+    const { error } = await supabase.rpc("retire_player", { p_player_id: player.id });
+    if (error) {
+      toast({ title: "Erro ao aposentar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: `🎖️ ${player.name} se aposentou com honras` });
+      setSelectedId(null);
+      queryClient.invalidateQueries({ queryKey: ["players"] });
+    }
     setActing(false);
   };
 
@@ -151,6 +169,11 @@ const Elenco = () => {
                   <Button size="sm" variant="outline" onClick={() => toggleForSale(selected)} disabled={acting}>
                     <DollarSign size={14} /> {selected.is_for_sale ? "Tirar da venda" : "Colocar à venda"}
                   </Button>
+                  {selected.age >= 32 && (
+                    <Button size="sm" variant="outline" onClick={() => retire(selected)} disabled={acting}>
+                      <LogOut size={14} /> Aposentar
+                    </Button>
+                  )}
                   <Button size="sm" variant="destructive" onClick={() => releasePlayer(selected)} disabled={acting}>
                     <UserX size={14} /> Dispensar
                   </Button>
