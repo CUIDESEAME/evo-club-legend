@@ -59,6 +59,12 @@ const SYSTEM_NEWS = [
   "👴 Jogadores com 28+ anos perdem atributos físicos no fim da temporada.",
   "💰 Salário dos jogadores é ajustado para 1% do valor de mercado a cada temporada.",
   "🏆 Prêmios de final de temporada: 1º R$500k, 2º R$300k, 3º R$150k.",
+  "🧠 Setor Psicologia reduz a agressividade dos jogadores ao longo das semanas.",
+  "🎓 Setor Escola aumenta a inteligência do elenco de forma passiva.",
+  "👷 Setor Funcionários acelera curas, melhora treino e cobra salário extra.",
+  "🏦 Banco: depósitos a prazo rendem juros entre 4% e 8% a.a. simulados.",
+  "🎯 Defina estilos de passe, marcação e posicionamento na tela de Escalação.",
+  "🏅 Veja troféus de qualquer clube na nova página /trofeus.",
 ];
 
 const Dashboard = () => {
@@ -83,6 +89,32 @@ const Dashboard = () => {
     },
     enabled: !!club,
   });
+
+  const { data: trophies } = useQuery({
+    queryKey: ["trophies", club?.id],
+    queryFn: async () => {
+      if (!club) return [];
+      const { data } = await supabase
+        .from("club_trophies")
+        .select("*")
+        .eq("club_id", club.id)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      return data ?? [];
+    },
+    enabled: !!club,
+  });
+
+  // Weekly digest: last ~7 days of premios + cup + socios deltas
+  const weeklyDigest = useMemo(() => {
+    if (!transactions?.length) return { prizes: [] as typeof transactions, memberDelta: 0, lastEvents: [] as typeof transactions };
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const recent = transactions.filter(t => new Date(t.created_at).getTime() >= cutoff);
+    const prizes = recent.filter(t => t.type === "premio" || t.type === "copa").slice(0, 5);
+    const lastEvents = recent.filter(t => t.type === "evento").slice(0, 4);
+    const memberRev = recent.filter(t => t.type === "socios").reduce((s, t) => s + t.amount, 0);
+    return { prizes, memberDelta: Math.round(memberRev / 100), lastEvents };
+  }, [transactions]);
 
   // Mini balance sheet from last 50 transactions
   const balanceSheet = useMemo(() => {
@@ -140,6 +172,54 @@ const Dashboard = () => {
         <div className="bg-accent/10 border border-accent/20 rounded-xl p-4 flex items-start gap-3">
           <Newspaper size={18} className="text-accent mt-0.5 shrink-0" />
           <p className="text-sm text-foreground">{randomNews}</p>
+        </div>
+
+        {/* Weekly Digest */}
+        <div className="bg-glass rounded-xl p-6">
+          <h2 className="font-heading text-xl font-bold text-foreground mb-4">📰 Histórico da Semana</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div>
+              <h3 className="font-heading text-xs text-muted-foreground mb-2">SÓCIOS (7 dias)</h3>
+              <p className={`font-heading text-2xl ${weeklyDigest.memberDelta >= 0 ? "text-primary" : "text-destructive"}`}>
+                {weeklyDigest.memberDelta >= 0 ? "+" : ""}{weeklyDigest.memberDelta}
+              </p>
+              <p className="text-xs text-muted-foreground">Total atual: {club.members.toLocaleString("pt-BR")}</p>
+            </div>
+            <div>
+              <h3 className="font-heading text-xs text-muted-foreground mb-2">ÚLTIMAS PREMIAÇÕES</h3>
+              {weeklyDigest.prizes.length ? weeklyDigest.prizes.map(p => (
+                <div key={p.id} className="flex justify-between text-xs py-0.5">
+                  <span className="text-muted-foreground truncate mr-2">{p.description}</span>
+                  <span className="text-primary font-heading whitespace-nowrap">+{formatMoney(p.amount)}</span>
+                </div>
+              )) : <p className="text-xs text-muted-foreground italic">Sem premiações esta semana.</p>}
+            </div>
+            <div>
+              <h3 className="font-heading text-xs text-muted-foreground mb-2">TROFÉUS RECENTES</h3>
+              {trophies && trophies.length ? trophies.map(t => (
+                <div key={t.id} className="text-xs py-0.5">
+                  <span className="text-accent">🏆 </span>
+                  <span className="text-foreground">{t.competition_name}</span>
+                  <span className="text-muted-foreground"> — Temp. {t.season_number}</span>
+                </div>
+              )) : <p className="text-xs text-muted-foreground italic">Nenhum troféu ainda. Vá em busca do primeiro!</p>}
+            </div>
+          </div>
+          {weeklyDigest.lastEvents.length > 0 && (
+            <div className="mt-4 pt-3 border-t border-border">
+              <h3 className="font-heading text-xs text-muted-foreground mb-2">EVENTOS ESPORÁDICOS</h3>
+              <div className="space-y-1">
+                {weeklyDigest.lastEvents.map(e => (
+                  <div key={e.id} className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">{e.description}</span>
+                    <span className={`font-heading ${e.amount >= 0 ? "text-primary" : "text-destructive"}`}>
+                      {e.amount >= 0 ? "+" : ""}{formatMoney(e.amount)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Stats Grid */}
