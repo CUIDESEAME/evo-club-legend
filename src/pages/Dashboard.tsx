@@ -3,7 +3,7 @@ import { useAuth } from "@/lib/auth";
 import { useClub } from "@/hooks/useClub";
 import { usePlayers, usePatrimony, useStadiumSectors, useFinancialTransactions } from "@/hooks/useClub";
 import GameLayout from "@/components/GameLayout";
-import { formatMoney, POSITION_ABBREVIATIONS, PATRIMONY_LABELS, PATRIMONY_ICONS, getOverallRating } from "@/lib/gameUtils";
+import { formatMoney, POSITION_ABBREVIATIONS, PATRIMONY_LABELS, PATRIMONY_ICONS, PATRIMONY_EFFECTS, getOverallRating } from "@/lib/gameUtils";
 import { Users, Building2, Coins, Trophy, TrendingUp, TrendingDown, Newspaper } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 import { useMemo } from "react";
@@ -374,6 +374,9 @@ const Dashboard = () => {
                 <span className="text-2xl">{PATRIMONY_ICONS[p.type] ?? "🏢"}</span>
                 <p className="text-xs text-foreground font-medium mt-1">{PATRIMONY_LABELS[p.type] ?? p.type}</p>
                 <p className="text-xs text-muted-foreground">Nível {p.level}</p>
+                <p className="text-[10px] text-accent mt-1 leading-tight">
+                  {PATRIMONY_EFFECTS[p.type]?.(p.level) ?? "—"}
+                </p>
                 {p.construction_weeks_remaining > 0 && (
                   <p className="text-xs text-accent">🔨 {p.construction_weeks_remaining}sem</p>
                 )}

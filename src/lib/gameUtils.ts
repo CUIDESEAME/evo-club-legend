@@ -69,6 +69,19 @@ export const PATRIMONY_ICONS: Record<string, string> = {
   funcionarios: "👔",
 };
 
+export const PATRIMONY_EFFECTS: Record<string, (level: number) => string> = {
+  estadio: (l) => `${(l * 10000).toLocaleString("pt-BR")} lugares • ingresso até R$100/cadeira`,
+  ct: (l) => `+${l * 5}% eficácia de treino`,
+  academia: (l) => `+${l * 4}% ganho físico semanal`,
+  alojamento: (l) => `${8 + l * 2} vagas de juniores`,
+  marketing: (l) => `+${l * 8}% patrocínio e sócios`,
+  clube_social: (l) => `+R$${(l * 50).toLocaleString("pt-BR")}k/sem em receita social`,
+  lojas: (l) => `+R$${(l * 30).toLocaleString("pt-BR")}k/sem em vendas`,
+  psicologia: (l) => `${l * 2} vagas • -${l}% agressividade/sem`,
+  escola: (l) => `${l * 2} vagas • +${l * 0.5}% inteligência geral`,
+  funcionarios: (l) => `+${l * 3}% recuperação e treino`,
+};
+
 export function formatMoney(cents: number): string {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
