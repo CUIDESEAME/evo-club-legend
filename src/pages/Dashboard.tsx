@@ -74,6 +74,7 @@ const Dashboard = () => {
   const { data: patrimony } = usePatrimony(club?.id);
   const { data: stadiumSectors } = useStadiumSectors(club?.id);
   const { data: transactions } = useFinancialTransactions(club?.id);
+  const { data: lineup } = (await import("@/hooks/useLineup")).useLineup(club?.id) as any;
 
   const { data: discEvents } = useQuery({
     queryKey: ["disciplinary", club?.id],
