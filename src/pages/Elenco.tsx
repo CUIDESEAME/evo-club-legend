@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useClub, usePlayers } from "@/hooks/useClub";
+import { useLineup } from "@/hooks/useLineup";
 import GameLayout from "@/components/GameLayout";
 import { POSITION_LABELS, POSITION_ABBREVIATIONS, ATTRIBUTE_LEVELS, formatMoney, getOverallRating, getAttributeColor } from "@/lib/gameUtils";
 import { useState } from "react";
@@ -27,6 +28,8 @@ const Elenco = () => {
   const { user, loading: authLoading } = useAuth();
   const { data: club, isLoading } = useClub();
   const { data: players } = usePlayers(club?.id);
+  const { data: lineup } = useLineup(club?.id);
+  const lineupIds = new Set((lineup?.players ?? []).map((lp: any) => lp.player_id));
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -120,6 +123,7 @@ const Elenco = () => {
                     <td className="py-2 text-foreground font-medium">
                       {p.name}
                       {p.is_captain && <span className="text-accent ml-1">©</span>}
+                      {lineupIds.has(p.id) && <span className="text-accent ml-1" title="Escalado">⚽</span>}
                       {p.is_for_sale && <span className="text-primary ml-1">💰</span>}
                       {p.is_injured && <span className="text-destructive ml-1">🤕</span>}
                     </td>

@@ -9,6 +9,7 @@ import { type LucideIcon } from "lucide-react";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useLineup } from "@/hooks/useLineup";
 
 function StatCard({ icon: Icon, label, value, sub, color = "text-foreground" }: {
   icon: LucideIcon; label: string; value: string; sub?: string; color?: string;
@@ -74,6 +75,8 @@ const Dashboard = () => {
   const { data: patrimony } = usePatrimony(club?.id);
   const { data: stadiumSectors } = useStadiumSectors(club?.id);
   const { data: transactions } = useFinancialTransactions(club?.id);
+  const { data: lineup } = useLineup(club?.id);
+  const lineupIds = new Set(((lineup?.players ?? []) as any[]).map(lp => lp.player_id));
 
   const { data: discEvents } = useQuery({
     queryKey: ["disciplinary", club?.id],
@@ -335,6 +338,7 @@ const Dashboard = () => {
                       <td className="py-2 text-foreground">
                         {p.name}
                         {p.is_captain && <span className="text-accent ml-1">©</span>}
+                        {lineupIds.has(p.id) && <span className="text-accent ml-1">⚽</span>}
                         {p.is_for_sale && <span className="text-primary ml-1">💰</span>}
                         {p.is_injured && <span className="text-destructive ml-1">🤕</span>}
                       </td>
