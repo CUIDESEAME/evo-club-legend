@@ -97,7 +97,7 @@ const Patrimonio = () => {
     if (!confirm(`Demolir ${PATRIMONY_LABELS[item.type]} para o nível ${item.level - 1}? Você receberá ${formatMoney(refund)} de reembolso.`)) return;
 
     setDemolishing(item.id);
-    const { error } = await supabase.rpc("downgrade_patrimony", {
+    const { error } = await (supabase.rpc as any)("downgrade_patrimony", {
       p_patrimony_id: item.id,
       p_club_id: club.id,
       p_refund: refund,
