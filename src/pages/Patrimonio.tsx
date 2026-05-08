@@ -8,7 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { ArrowUp, Clock, Coins } from "lucide-react";
+import { ArrowUp, Clock, Coins, Trash2 } from "lucide-react";
 
 const UPGRADE_COSTS: Record<string, number[]> = {
   estadio: [0, 50000, 120000, 250000, 500000, 1000000, 2000000, 4000000, 7000000, 12000000],
@@ -45,6 +45,7 @@ const Patrimonio = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [upgrading, setUpgrading] = useState<string | null>(null);
+  const [demolishing, setDemolishing] = useState<string | null>(null);
 
   if (authLoading || isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
   if (!user) return <Navigate to="/auth" replace />;
@@ -86,6 +87,31 @@ const Patrimonio = () => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     }
     setUpgrading(null);
+  };
+
+  const handleDemolish = async (item: { id: string; type: string; level: number; construction_weeks_remaining: number }) => {
+    if (item.level < 1 || item.construction_weeks_remaining > 0) return;
+    const costs = UPGRADE_COSTS[item.type] ?? [];
+    const originalCost = costs[item.level - 1] ?? 0;
+    const refund = Math.floor(originalCost * 0.3);
+    if (!confirm(`Demolir ${PATRIMONY_LABELS[item.type]} para o nível ${item.level - 1}? Você receberá ${formatMoney(refund)} de reembolso.`)) return;
+
+    setDemolishing(item.id);
+    const { error } = await supabase.rpc("downgrade_patrimony", {
+      p_patrimony_id: item.id,
+      p_club_id: club.id,
+      p_refund: refund,
+      p_description: `Demolição: ${PATRIMONY_LABELS[item.type] ?? item.type} → Nível ${item.level - 1}`,
+    });
+    if (error) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Demolido", description: `${PATRIMONY_LABELS[item.type]} → Nível ${item.level - 1}` });
+      queryClient.invalidateQueries({ queryKey: ["patrimony"] });
+      queryClient.invalidateQueries({ queryKey: ["club"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    }
+    setDemolishing(null);
   };
 
   const totalMaintenance = patrimony?.reduce((sum, p) => sum + p.maintenance_cost, 0) ?? 0;
@@ -153,6 +179,19 @@ const Patrimonio = () => {
                   </Button>
                 ) : (
                   <p className="text-xs text-center text-accent font-heading">NÍVEL MÁXIMO ✨</p>
+                )}
+
+                {!isBuilding && p.level >= 1 && (
+                  <Button
+                    onClick={() => handleDemolish(p)}
+                    disabled={demolishing === p.id}
+                    variant="outline"
+                    className="w-full mt-2 text-destructive hover:bg-destructive/10"
+                    size="sm"
+                  >
+                    <Trash2 size={12} />
+                    {demolishing === p.id ? "Demolindo..." : `Demolir (reembolso 30%)`}
+                  </Button>
                 )}
               </div>
             );
