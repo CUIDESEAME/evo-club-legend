@@ -1230,6 +1230,27 @@ export type Database = {
         Args: { p_amount: number; p_club_id: string; p_weeks: number }
         Returns: Json
       }
+      downgrade_patrimony:
+        | {
+            Args: {
+              p_club_id: string
+              p_description: string
+              p_patrimony_id: string
+              p_refund: number
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_club_id: string
+              p_description: string
+              p_new_level: number
+              p_new_maintenance: number
+              p_patrimony_id: string
+              p_refund: number
+            }
+            Returns: undefined
+          }
       end_season: { Args: { p_season_id: string }; Returns: undefined }
       finalize_auctions: { Args: never; Returns: Json }
       initialize_season_for_club: {
