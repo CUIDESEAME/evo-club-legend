@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useClub } from "@/hooks/useClub";
-import { useMatches, useNpcClubs, useSeasons } from "@/hooks/useLeague";
+import { useMatches, useNpcClubs, useClubSeason } from "@/hooks/useLeague";
 import GameLayout from "@/components/GameLayout";
 import { formatMoney } from "@/lib/gameUtils";
 import { Swords, Calendar, Trophy } from "lucide-react";
@@ -9,8 +9,7 @@ import { Swords, Calendar, Trophy } from "lucide-react";
 const Partidas = () => {
   const { user, loading: authLoading } = useAuth();
   const { data: club, isLoading } = useClub();
-  const { data: seasons } = useSeasons(club?.league);
-  const season = seasons?.[0];
+  const { data: season } = useClubSeason(club?.id);
   const { data: matches } = useMatches(season?.id, club?.id);
   const { data: npcClubs } = useNpcClubs(season?.id);
 

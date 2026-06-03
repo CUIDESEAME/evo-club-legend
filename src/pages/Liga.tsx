@@ -1,15 +1,14 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useClub } from "@/hooks/useClub";
-import { useLeagueStandings, useSeasons, useNpcClubs } from "@/hooks/useLeague";
+import { useLeagueStandings, useClubSeason, useNpcClubs } from "@/hooks/useLeague";
 import GameLayout from "@/components/GameLayout";
 import { Trophy, ArrowUp, ArrowDown, Minus } from "lucide-react";
 
 const Liga = () => {
   const { user, loading: authLoading } = useAuth();
   const { data: club, isLoading } = useClub();
-  const { data: seasons } = useSeasons(club?.league);
-  const season = seasons?.[0];
+  const { data: season } = useClubSeason(club?.id);
   const { data: standings } = useLeagueStandings(season?.id);
   const { data: npcClubs } = useNpcClubs(season?.id);
 

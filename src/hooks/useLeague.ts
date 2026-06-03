@@ -1,6 +1,32 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+// Retorna a temporada ativa em que o clube realmente está inscrito
+export function useClubSeason(clubId: string | undefined) {
+  return useQuery({
+    queryKey: ["club_season", clubId],
+    queryFn: async () => {
+      if (!clubId) return null;
+      const { data: standing, error: sErr } = await supabase
+        .from("league_standings")
+        .select("season_id")
+        .eq("club_id", clubId)
+        .limit(1)
+        .maybeSingle();
+      if (sErr) throw sErr;
+      if (!standing?.season_id) return null;
+      const { data, error } = await supabase
+        .from("seasons")
+        .select("*")
+        .eq("id", standing.season_id)
+        .maybeSingle();
+      if (error) throw error;
+      return data ?? null;
+    },
+    enabled: !!clubId,
+  });
+}
+
 export function useSeasons(league: string | undefined) {
   return useQuery({
     queryKey: ["seasons", league],
