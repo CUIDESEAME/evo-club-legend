@@ -43,26 +43,36 @@ Deno.serve(async (req) => {
       await supabase.rpc("advance_cup_phase", { p_cup_id: cup.id });
     }
 
-    // 2f. Auto end-season when all rounds are played
+    // 2f. Auto end-season when every round has been played.
+    // A season completes once it reaches the final round AND has no scheduled
+    // matches left. end_season marks it 'completed' and starts a fresh single
+    // season for the club, so a club is only ever in ONE active season at a time.
     const { data: finishedSeasons } = await supabase
       .from("seasons")
       .select("id, current_round, total_rounds")
       .eq("status", "active");
     for (const s of finishedSeasons ?? []) {
-      if (s.current_round > s.total_rounds) {
-        await supabase.rpc("end_season", { p_season_id: s.id });
+      if (s.current_round >= s.total_rounds) {
+        const { count } = await supabase
+          .from("matches")
+          .select("id", { count: "exact", head: true })
+          .eq("season_id", s.id)
+          .eq("status", "scheduled");
+        if (!count) {
+          await supabase.rpc("end_season", { p_season_id: s.id });
+        }
       }
     }
 
-    // 3. Check if we should process weekly tasks (training, salaries, etc.)
-    const { data: seasons } = await supabase
-      .from("seasons")
-      .select("id, current_round")
-      .eq("status", "active");
+    // 3. Process weekly tasks (salaries, maintenance, income, training) ONLY
+    // when matches were actually played this tick. This ties the economy to
+    // real game progression (one processed week per round) instead of firing
+    // every 60s, which previously caused runaway/infinite income.
+    const matchesPlayed = (matchResult as { matches_played?: number } | null)?.matches_played ?? 0;
+    const shouldProcessWeek = matchesPlayed > 0;
 
     let weekResult = null;
     let weekError = null;
-    const shouldProcessWeek = seasons?.some(s => s.current_round % 2 === 0);
 
     if (shouldProcessWeek) {
       const res = await supabase.rpc("process_game_week");
