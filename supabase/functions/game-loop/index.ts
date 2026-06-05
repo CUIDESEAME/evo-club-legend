@@ -85,6 +85,11 @@ Deno.serve(async (req) => {
       weekError = res.error;
     }
 
+    // 4. Automatic housekeeping: purge irrelevant history (old seasons, their
+    // matches/standings/NPCs, stale transactions & disciplinary records) and
+    // recycle finished cups. Trophies are kept permanently. Keeps the game light.
+    await supabase.rpc("cleanup_old_data");
+
     const errors = [];
     if (matchError) errors.push(matchError.message);
     if (weekError) errors.push(weekError.message);
