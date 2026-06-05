@@ -34,12 +34,17 @@ Deno.serve(async (req) => {
     await supabase.rpc("process_sporadic_events");
     await supabase.rpc("process_bank_deposits");
 
-    // 2e. Advance any in-progress cups
+    // 2e. Auto-fill open cups with rule-following teams, then advance any cup.
+    // National cups draw the strongest clubs; U20 cups are scored using only
+    // players up to 20 years old (handled inside cup_team_strength).
     const { data: activeCups } = await supabase
       .from("cups")
-      .select("id")
+      .select("id, status")
       .in("status", ["open", "in_progress"]);
     for (const cup of activeCups ?? []) {
+      if (cup.status === "open") {
+        await supabase.rpc("populate_cup", { p_cup_id: cup.id });
+      }
       await supabase.rpc("advance_cup_phase", { p_cup_id: cup.id });
     }
 

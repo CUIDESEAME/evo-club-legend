@@ -78,6 +78,15 @@ const Copas = () => {
     },
   });
 
+  // NPC squads can also play in the cups — resolve their names too
+  const { data: allNpcClubs } = useQuery({
+    queryKey: ["all_npc_names"],
+    queryFn: async () => {
+      const { data } = await supabase.from("npc_clubs").select("id, name, abbreviation");
+      return data ?? [];
+    },
+  });
+
   if (authLoading || isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
   if (!user) return <Navigate to="/auth" replace />;
   if (!club) return <Navigate to="/criar-clube" replace />;
@@ -87,7 +96,9 @@ const Copas = () => {
   const clubName = (id: string | null) => {
     if (!id) return "—";
     const c = allClubs?.find(x => x.id === id);
-    return c?.name ?? "Clube";
+    if (c) return c.name;
+    const npc = allNpcClubs?.find(x => x.id === id);
+    return npc?.name ?? "Clube";
   };
 
   // Computa classificação (pontos/vitórias) a partir das partidas jogadas de uma copa
