@@ -1230,6 +1230,10 @@ export type Database = {
         Args: { p_amount: number; p_club_id: string; p_weeks: number }
         Returns: Json
       }
+      cup_team_strength: {
+        Args: { p_id: string; p_u20: boolean }
+        Returns: number
+      }
       downgrade_patrimony:
         | {
             Args: {
@@ -1270,6 +1274,7 @@ export type Database = {
         Args: { p_bid: number; p_club_id: string; p_listing_id: string }
         Returns: undefined
       }
+      populate_cup: { Args: { p_cup_id: string }; Returns: Json }
       process_agent_negotiations: { Args: never; Returns: undefined }
       process_bank_deposits: { Args: never; Returns: Json }
       process_disciplinary_events: { Args: never; Returns: undefined }
