@@ -1226,6 +1226,7 @@ export type Database = {
         Args: { p_club_id: string; p_listing_id: string }
         Returns: Json
       }
+      cleanup_old_data: { Args: never; Returns: Json }
       create_bank_deposit: {
         Args: { p_amount: number; p_club_id: string; p_weeks: number }
         Returns: Json
