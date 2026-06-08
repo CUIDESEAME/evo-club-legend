@@ -1222,6 +1222,10 @@ export type Database = {
     Functions: {
       advance_cup_phase: { Args: { p_cup_id: string }; Returns: Json }
       advance_season: { Args: { p_season_id: string }; Returns: Json }
+      build_division_season: {
+        Args: { p_clubs: string[]; p_division: number; p_league: string }
+        Returns: string
+      }
       buy_from_closed_market: {
         Args: { p_club_id: string; p_listing_id: string }
         Returns: Json
@@ -1299,6 +1303,7 @@ export type Database = {
         Args: { p_club_id: string; p_tier: string }
         Returns: Json
       }
+      setup_division_seasons: { Args: never; Returns: undefined }
       setup_shared_season: { Args: never; Returns: string }
       simulate_matches: { Args: never; Returns: Json }
       take_loan: {
