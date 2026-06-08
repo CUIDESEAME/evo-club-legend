@@ -1299,6 +1299,7 @@ export type Database = {
         Args: { p_club_id: string; p_tier: string }
         Returns: Json
       }
+      setup_shared_season: { Args: never; Returns: string }
       simulate_matches: { Args: never; Returns: Json }
       take_loan: {
         Args: { p_amount: number; p_club_id: string }
