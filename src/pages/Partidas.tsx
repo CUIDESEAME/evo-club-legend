@@ -2,6 +2,8 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useClub } from "@/hooks/useClub";
 import { useMatches, useNpcClubs, useClubSeason } from "@/hooks/useLeague";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import GameLayout from "@/components/GameLayout";
 import { formatMoney } from "@/lib/gameUtils";
 import { Swords, Calendar, Trophy } from "lucide-react";
@@ -12,6 +14,14 @@ const Partidas = () => {
   const { data: season } = useClubSeason(club?.id);
   const { data: matches } = useMatches(season?.id, club?.id);
   const { data: npcClubs } = useNpcClubs(season?.id);
+
+  const { data: allClubs } = useQuery({
+    queryKey: ["all_clubs_basic"],
+    queryFn: async () => {
+      const { data } = await supabase.from("clubs").select("id,name,abbreviation");
+      return data ?? [];
+    },
+  });
 
   if (authLoading || isLoading) {
     return (
@@ -29,9 +39,14 @@ const Partidas = () => {
     return npcClubs?.find(n => n.id === id)?.name ?? "NPC";
   };
 
+  const getClubName = (id: string | null) => {
+    if (!id) return null;
+    return allClubs?.find(c => c.id === id)?.name ?? null;
+  };
+
   const getOpponent = (match: { home_club_id: string | null; away_club_id: string | null; home_npc_id: string | null; away_npc_id: string | null }) => {
-    if (match.home_club_id === club.id) return getNpcName(match.away_npc_id) ?? "—";
-    if (match.away_club_id === club.id) return getNpcName(match.home_npc_id) ?? "—";
+    if (match.home_club_id === club.id) return getClubName(match.away_club_id) ?? getNpcName(match.away_npc_id) ?? "—";
+    if (match.away_club_id === club.id) return getClubName(match.home_club_id) ?? getNpcName(match.home_npc_id) ?? "—";
     return "—";
   };
 
