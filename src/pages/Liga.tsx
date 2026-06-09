@@ -2,6 +2,8 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useClub } from "@/hooks/useClub";
 import { useLeagueStandings, useClubSeason, useNpcClubs } from "@/hooks/useLeague";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import GameLayout from "@/components/GameLayout";
 import { Trophy, ArrowUp, ArrowDown, Minus } from "lucide-react";
 
@@ -11,6 +13,15 @@ const Liga = () => {
   const { data: season } = useClubSeason(club?.id);
   const { data: standings } = useLeagueStandings(season?.id);
   const { data: npcClubs } = useNpcClubs(season?.id);
+
+  // All real clubs, so we can display other human-managed teams (not just NPCs)
+  const { data: allClubs } = useQuery({
+    queryKey: ["all_clubs_basic"],
+    queryFn: async () => {
+      const { data } = await supabase.from("clubs").select("id,name,abbreviation");
+      return data ?? [];
+    },
+  });
 
   if (authLoading || isLoading) {
     return (
@@ -25,12 +36,20 @@ const Liga = () => {
 
   const getTeamName = (standing: { club_id: string | null; npc_club_id: string | null }) => {
     if (standing.club_id === club.id) return club.name;
+    if (standing.club_id) {
+      const real = allClubs?.find(c => c.id === standing.club_id);
+      if (real) return real.name;
+    }
     const npc = npcClubs?.find(n => n.id === standing.npc_club_id);
     return npc?.name ?? "—";
   };
 
   const getTeamAbbrev = (standing: { club_id: string | null; npc_club_id: string | null }) => {
     if (standing.club_id === club.id) return club.abbreviation;
+    if (standing.club_id) {
+      const real = allClubs?.find(c => c.id === standing.club_id);
+      if (real) return real.abbreviation;
+    }
     const npc = npcClubs?.find(n => n.id === standing.npc_club_id);
     return npc?.abbreviation ?? "—";
   };
