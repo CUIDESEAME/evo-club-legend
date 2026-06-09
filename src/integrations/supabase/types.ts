@@ -1290,6 +1290,7 @@ export type Database = {
         Args: { p_club_id: string; p_cup_id: string }
         Returns: Json
       }
+      repair_game_progression: { Args: never; Returns: Json }
       repay_loan: {
         Args: { p_club_id: string; p_loan_id: string }
         Returns: Json

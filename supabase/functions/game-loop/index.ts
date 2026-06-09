@@ -16,6 +16,11 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
+    // 0. Repair dead progression before simulating. If a season reached the
+    // final round with no scheduled matches, this closes it and creates the
+    // next playable table instead of leaving time/economy frozen.
+    await supabase.rpc("repair_game_progression");
+
     // 1. Simulate matches (1 round per call, every 60s)
     const { data: matchResult, error: matchError } = await supabase.rpc("simulate_matches");
 
